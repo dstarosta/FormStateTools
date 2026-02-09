@@ -2,17 +2,22 @@ type FormDockHeaderProps = Readonly<{
   minimized: boolean;
   valid: boolean | null;
   onClick: (event: React.SyntheticEvent) => void;
+  onRightClick: (event: React.SyntheticEvent) => void;
 }>;
 
-function FormDockHeader({ minimized, valid, onClick }: FormDockHeaderProps) {
+function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHeaderProps) {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.altKey || event.ctrlKey || event.shiftKey) {
       return;
     }
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === ' ') {
       onClick(event);
+    } else if (event.key === 'Enter') {
+      onRightClick(event);
     }
   };
+
+  const title = `Click to ${minimized ? 'expand' : 'collapse'} the form tools panel. Right mouse click maximizes the panel.`;
 
   return (
     <div
@@ -40,7 +45,7 @@ function FormDockHeader({ minimized, valid, onClick }: FormDockHeaderProps) {
       }}
       role="button"
       tabIndex={0}
-      title={`Click to ${minimized ? 'expand' : 'collapse'} the form tools panel.`}
+      title={title}
       onFocus={(event) => {
         event.currentTarget.style.outline = 'solid 1px oklch(83.7% 0.128 66.29)';
       }}
@@ -48,6 +53,7 @@ function FormDockHeader({ minimized, valid, onClick }: FormDockHeaderProps) {
         event.currentTarget.style.outline = 'none';
       }}
       onClick={onClick}
+      onContextMenu={onRightClick}
       onKeyDown={handleKeyPress}
     >
       <span

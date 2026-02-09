@@ -73,6 +73,20 @@ const isIgnoredError = (error: ErrorWrapper, patterns: ErrorPattern[]) => {
   return false;
 };
 
+const isObjectOrArray = (value: string) => {
+  const trimmedValue = value.trim();
+
+  if (trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) {
+    return true;
+  }
+
+  if (trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) {
+    return true;
+  }
+
+  return false;
+};
+
 function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
   const [errors, setErrors] = useState<ErrorWrapper[]>([]);
 
@@ -252,19 +266,23 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
       </h3>
       {errors
         .filter((error) => !isEmptyError(error))
-        .map((error, index) => (
-          <pre
-            key={String(index)}
-            style={{
-              fontWeight: 600,
-              marginTop: '10px',
-              wordBreak: 'break-word',
-              whiteSpace: typeof error.value === 'object' ? undefined : 'wrap',
-            }}
-          >
-            {formatValue(error)}
-          </pre>
-        ))}
+        .map((error, index) => {
+          const formattedError = formatValue(error);
+
+          return (
+            <pre
+              key={String(index)}
+              style={{
+                fontWeight: 600,
+                marginTop: '10px',
+                wordBreak: 'break-word',
+                whiteSpace: isObjectOrArray(formattedError) ? undefined : 'wrap',
+              }}
+            >
+              {formattedError}
+            </pre>
+          );
+        })}
     </dialog>
   );
 }

@@ -7,6 +7,8 @@ import FormDockHeader from './form-dock-header';
 import ErrorToast from './error-toast';
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 
+type FormDockSize = 'minimized' | 'normal' | 'maximized';
+
 type FormDockPanelProps = Readonly<{
   form: FormStateResponse<ZodObject>;
   collapsed: boolean;
@@ -51,15 +53,35 @@ function FormDockPanel({
   captureErrors,
   ignoreErrorPatterns,
 }: FormDockPanelProps) {
-  const [minimized, setMinimized] = useState<boolean>(collapsed);
+  const [size, setSize] = useState<FormDockSize>(collapsed ? 'minimized' : 'normal');
 
   const formJSON = JSON.stringify({ state: form.formState, status: form.formStatus });
   const formObject = JSON.parse(formJSON) as object;
 
+  const getHeight = () => {
+    switch (size) {
+      case 'minimized': {
+        return '1.125rem';
+      }
+      case 'maximized': {
+        return '100vh';
+      }
+      default: {
+        return '30vh';
+      }
+    }
+  };
+
   const handleClick = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    setMinimized((prev) => !prev);
+    setSize((prev) => (prev === 'normal' ? 'minimized' : 'normal'));
+  };
+
+  const handleRightClick = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+
+    setSize((prev) => (prev === 'maximized' ? 'normal' : 'maximized'));
   };
 
   return (
@@ -70,7 +92,7 @@ function FormDockPanel({
           backgroundColor: 'rgb(0, 43, 54)',
           minWidth: '100%',
           width: '100%',
-          height: minimized ? '1.125rem' : '30vh',
+          height: getHeight(),
           paddingLeft: '0.75rem',
           paddingRight: '0.75rem',
           overflow: 'auto',
@@ -79,7 +101,15 @@ function FormDockPanel({
           bottom: 0,
         }}
       >
-        {Boolean(minimized) && (
+        {size === 'maximized' && (
+          <style>{`
+          body {
+            overflow-y: auto;
+            margin-bottom: 0;
+          }
+        `}</style>
+        )}
+        {size === 'minimized' && (
           <style>{`
           body {
             overflow-y: auto;
@@ -87,7 +117,7 @@ function FormDockPanel({
           }
         `}</style>
         )}
-        {!minimized && (
+        {size === 'normal' && (
           <style>{`
           body {
             overflow-y: auto;
@@ -95,8 +125,13 @@ function FormDockPanel({
           }
         `}</style>
         )}
-        <FormDockHeader minimized={minimized} valid={form.formStatus.valid} onClick={handleClick} />
-        {!minimized && (
+        <FormDockHeader
+          minimized={size === 'minimized'}
+          valid={form.formStatus.valid}
+          onClick={handleClick}
+          onRightClick={handleRightClick}
+        />
+        {size !== 'minimized' && (
           <JSONTree
             data={formObject}
             keyPath={['form']}
