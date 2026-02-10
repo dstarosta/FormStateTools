@@ -59,13 +59,11 @@ const isIgnoredError = (error: ErrorWrapper, patterns: ErrorPattern[]) => {
   const stringValue = formatValue(error);
 
   for (const pattern of patterns) {
-    console.info(pattern, error.value, stringValue);
-
     if (pattern instanceof RegExp) {
       if (pattern.test(stringValue)) {
         return true;
       }
-    } else if (pattern.includes(stringValue)) {
+    } else if (stringValue.includes(pattern)) {
       return true;
     }
   }
@@ -74,7 +72,7 @@ const isIgnoredError = (error: ErrorWrapper, patterns: ErrorPattern[]) => {
 };
 
 const isObjectOrArray = (value: string) => {
-  const trimmedValue = value.trim();
+  const trimmedValue = value.trim().replace(/^\w+Error:\s/, '');
 
   if (trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) {
     return true;
@@ -163,6 +161,8 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
   useEffect(() => {
     const dialog = dialogRef.current;
 
+    // A defensive check that cannot be easily reproduced.
+    /* v8 ignore if -- @preserve */
     if (!dialog) {
       return;
     }

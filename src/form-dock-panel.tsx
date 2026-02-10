@@ -9,7 +9,7 @@ import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
 
-type FormDockPanelProps = Readonly<{
+export type FormDockPanelProps = Readonly<{
   form: FormStateResponse<ZodObject>;
   collapsed: boolean;
   captureErrors: CapturedErrorLevel;
