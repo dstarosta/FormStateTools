@@ -71,7 +71,7 @@ const isIgnoredError = (error: ErrorWrapper, patterns: ErrorPattern[]) => {
   return false;
 };
 
-const isObjectOrArray = (value: string) => {
+const isObjectArrayOrTemplate = (value: string) => {
   const trimmedValue = value.trim().replace(/^\w+Error:\s/, '');
 
   if (trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) {
@@ -79,6 +79,10 @@ const isObjectOrArray = (value: string) => {
   }
 
   if (trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) {
+    return true;
+  }
+
+  if (trimmedValue.startsWith('`') && trimmedValue.endsWith('`')) {
     return true;
   }
 
@@ -276,7 +280,7 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
                 fontWeight: 600,
                 marginTop: '10px',
                 wordBreak: 'break-word',
-                whiteSpace: isObjectOrArray(formattedError) ? undefined : 'wrap',
+                whiteSpace: isObjectArrayOrTemplate(formattedError) ? undefined : 'wrap',
               }}
             >
               {formattedError}
