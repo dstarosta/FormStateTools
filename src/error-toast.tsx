@@ -24,6 +24,16 @@ const formatValue = ({ type, value }: ErrorWrapper) => {
     return prefix + '[Promise]';
   }
 
+  if (typeof value === 'string') {
+    const trimmedValue = value.trim();
+
+    if (trimmedValue.startsWith('`') && trimmedValue.endsWith('`')) {
+      return `${prefix}\n${trimmedValue}`;
+    }
+
+    return prefix + trimmedValue;
+  }
+
   if (typeof value !== 'object') {
     return prefix + String(value);
   }
@@ -72,7 +82,7 @@ const isIgnoredError = (error: ErrorWrapper, patterns: ErrorPattern[]) => {
 };
 
 const isObjectArrayOrTemplate = (value: string) => {
-  const trimmedValue = value.trim().replace(/^\w+Error:\s/, '');
+  const trimmedValue = value.replace(/^\w+Error:\s/, '').trim();
 
   if (trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) {
     return true;
@@ -272,6 +282,7 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
         .filter((error) => !isEmptyError(error))
         .map((error, index) => {
           const formattedError = formatValue(error);
+          const isSpecialError = isObjectArrayOrTemplate(formattedError);
 
           return (
             <pre
@@ -280,10 +291,12 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
                 fontWeight: 600,
                 marginTop: '10px',
                 wordBreak: 'break-word',
-                whiteSpace: isObjectArrayOrTemplate(formattedError) ? undefined : 'wrap',
+                whiteSpace: isSpecialError ? undefined : 'wrap',
               }}
             >
-              {formattedError}
+              {isSpecialError
+                ? formattedError.replace(/(^`)|(\n`)/, '\n').replace(/`$/, '')
+                : formattedError}
             </pre>
           );
         })}

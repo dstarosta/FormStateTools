@@ -78,6 +78,28 @@ describe('ErrorToast', async () => {
       });
     });
 
+    it('should format strings', async () => {
+      render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
+
+      const error = '  test error message\n ';
+      console.error(error);
+
+      await waitFor(() => {
+        expect(screen.getByText(/ConsoleError: test error message/)).toBeInTheDocument();
+      });
+    });
+
+    it('should format templated strings', async () => {
+      render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
+
+      const error = '`  test error\n   message  `';
+      console.error(error);
+
+      await waitFor(() => {
+        expect(screen.getByText(/ConsoleError: test error message/)).toBeInTheDocument();
+      });
+    });
+
     it('should format plain objects as JSON', async () => {
       render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
