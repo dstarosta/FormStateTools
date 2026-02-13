@@ -55,7 +55,11 @@ function FormDockPanel({
 }: FormDockPanelProps) {
   const [size, setSize] = useState<FormDockSize>(collapsed ? 'minimized' : 'normal');
 
-  const formJSON = JSON.stringify({ state: form.formState, status: form.formStatus });
+  const formJSON = JSON.stringify({
+    initiailState: form.initialState,
+    state: form.formState,
+    status: form.formStatus,
+  });
   const formObject = JSON.parse(formJSON) as object;
 
   const getHeight = () => {
