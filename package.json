@@ -25,7 +25,7 @@
     "zod": ">= 4.3.0 < 5.0.0"
   },
   "dependencies": {
-    "form-state": "github:dstarosta/FormState"
+    "form-state": "github:dstarosta/FormState#v1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
