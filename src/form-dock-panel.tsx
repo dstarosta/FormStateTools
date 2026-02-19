@@ -16,6 +16,11 @@ export type FormDockPanelProps = Readonly<{
   ignoreErrorPatterns: ErrorPattern[];
 }>;
 
+const FORM_SIZE_KEY = '__form-dock-size';
+
+const HAS_SESSION_STORAGE =
+  typeof globalThis.sessionStorage === 'object' && globalThis.sessionStorage != null;
+
 const getLabelColor = (key?: string | number) => {
   let color: string;
 
@@ -47,13 +52,29 @@ const getKeyColor = (keys: KeyPath) => {
   return 'oklch(91.7% 0.08 205.041)';
 };
 
+const getInitialSize = (collapsed: boolean) => {
+  const storedSize = HAS_SESSION_STORAGE ? sessionStorage.getItem(FORM_SIZE_KEY) : null;
+
+  if (typeof storedSize === 'string' && storedSize.length > 0) {
+    return storedSize as FormDockSize;
+  }
+
+  return collapsed ? 'minimized' : 'normal';
+};
+
+const setInitialSize = (size: FormDockSize) => {
+  if (HAS_SESSION_STORAGE) {
+    sessionStorage.setItem(FORM_SIZE_KEY, size);
+  }
+};
+
 function FormDockPanel({
   form,
   collapsed,
   captureErrors,
   ignoreErrorPatterns,
 }: FormDockPanelProps) {
-  const [size, setSize] = useState<FormDockSize>(collapsed ? 'minimized' : 'normal');
+  const [size, setSize] = useState<FormDockSize>(getInitialSize(collapsed));
 
   const formJSON = JSON.stringify({
     initiailState: form.initialState,
@@ -79,13 +100,23 @@ function FormDockPanel({
   const handleClick = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    setSize((prev) => (prev === 'normal' ? 'minimized' : 'normal'));
+    setSize((prev) => {
+      const nextSize = prev === 'normal' ? 'minimized' : 'normal';
+      setInitialSize(nextSize);
+
+      return nextSize;
+    });
   };
 
   const handleRightClick = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    setSize((prev) => (prev === 'maximized' ? 'normal' : 'maximized'));
+    setSize((prev) => {
+      const nextSize = prev === 'maximized' ? 'normal' : 'maximized';
+      setInitialSize(nextSize);
+
+      return nextSize;
+    });
   };
 
   return (
