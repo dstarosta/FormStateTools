@@ -68,6 +68,17 @@ const setInitialSize = (size: FormDockSize) => {
   }
 };
 
+const initializeRef = (element: HTMLElement | null) => {
+  if (element) {
+    if (!element.style.getPropertyValue('pointer-events')) {
+      element.style.setProperty('pointer-events', 'auto', 'important');
+    }
+    if (!element.matches(':popover-open')) {
+      element.showPopover();
+    }
+  }
+};
+
 function FormDockPanel({
   form,
   collapsed,
@@ -122,6 +133,8 @@ function FormDockPanel({
   return (
     <>
       <aside
+        ref={initializeRef}
+        popover="manual"
         style={{
           position: 'fixed',
           backgroundColor: 'rgb(0, 43, 54)',
@@ -131,34 +144,34 @@ function FormDockPanel({
           paddingLeft: '0.75rem',
           paddingRight: '0.75rem',
           overflow: 'auto',
-          zIndex: 1000,
           left: 0,
+          top: 'auto',
           bottom: 0,
         }}
       >
         {size === 'maximized' && (
           <style>{`
-          body {
-            overflow-y: auto;
-            margin-bottom: 0;
-          }
-        `}</style>
+            body {
+              overflow-y: auto;
+              margin-bottom: 0;
+            }
+          `}</style>
         )}
         {size === 'minimized' && (
           <style>{`
-          body {
-            overflow-y: auto;
-            margin-bottom: 2.5rem;
-          }
-        `}</style>
+            body {
+              overflow-y: auto;
+              margin-bottom: 2.5rem;
+            }
+          `}</style>
         )}
         {size === 'normal' && (
           <style>{`
-          body {
-            overflow-y: auto;
-            margin-bottom: 33vh;
-          }
-        `}</style>
+            body {
+              overflow-y: auto;
+              margin-bottom: 33vh;
+            }
+          `}</style>
         )}
         <FormDockHeader
           minimized={size === 'minimized'}
