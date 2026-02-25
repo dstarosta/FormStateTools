@@ -1,5 +1,5 @@
 import * as react_jsx_runtime0 from "react/jsx-runtime";
-import { ZodObject } from "zod/v4";
+import { ZodObject } from "zod";
 import { FormStateResponse } from "form-state";
 
 //#region src/form-dock.d.ts

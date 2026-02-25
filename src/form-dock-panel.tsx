@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { type KeyPath, JSONTree } from 'react-json-tree';
-import { type ZodObject } from 'zod/v4';
+import { type ZodObject } from 'zod';
 import type { FormStateResponse } from 'form-state';
 
+import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 import FormDockHeader from './form-dock-header';
 import ErrorToast from './error-toast';
-import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
 
