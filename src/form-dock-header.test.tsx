@@ -474,7 +474,6 @@ describe('FormDockHeader', () => {
       const childClick = vi.fn();
 
       render(
-        // eslint-disable-next-line jsx-a11y/anchor-is-valid
         <a href="#" onClick={parentClick}>
           <FormDockHeader {...defaultProps} onClick={childClick} />
         </a>

@@ -13,3 +13,6 @@ Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
     return (this as Element)?.parentNode ?? null;
   },
 });
+
+HTMLElement.prototype.showPopover = () => {};
+HTMLElement.prototype.hidePopover = () => {};
