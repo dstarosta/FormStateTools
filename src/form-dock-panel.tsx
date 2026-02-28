@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { type KeyPath, JSONTree } from 'react-json-tree';
-import { type ZodObject } from 'zod';
+import type * as z from 'zod/mini';
 import type { FormStateResponse } from 'form-state';
 
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
@@ -10,7 +10,7 @@ import ErrorToast from './error-toast';
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
 
 export type FormDockPanelProps = Readonly<{
-  form: FormStateResponse<ZodObject>;
+  form: FormStateResponse<z.ZodMiniObject>;
   collapsed: boolean;
   captureErrors: CapturedErrorLevel;
   ignoreErrorPatterns: ErrorPattern[];

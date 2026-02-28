@@ -1,4 +1,4 @@
-import { type ZodObject } from 'zod';
+import type * as z from 'zod/mini';
 import { type FormStateResponse } from 'form-state';
 
 import FormDockPanel from './form-dock-panel';
@@ -27,7 +27,7 @@ export type FormDockProps = Readonly<{
   /**
    * The form state instance.
    */
-  form: FormStateResponse<ZodObject>;
+  form: FormStateResponse<z.ZodMiniObject>;
   /**
    * Is the application code running in "development" mode?
    *

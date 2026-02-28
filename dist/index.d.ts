@@ -1,12 +1,12 @@
 import * as react_jsx_runtime0 from "react/jsx-runtime";
-import { ZodObject } from "zod";
+import * as z from "zod/mini";
 import { FormStateResponse } from "form-state";
 
 //#region src/form-dock.d.ts
 type CapturedErrorLevel = 'all' | 'console' | 'thrown' | 'none';
 type ErrorPattern = string | RegExp;
 type FormDockProps = Readonly<{
-  form: FormStateResponse<ZodObject>;
+  form: FormStateResponse<z.ZodMiniObject>;
   devMode?: boolean;
   collapsed?: boolean;
   captureErrors?: CapturedErrorLevel;
