@@ -188,7 +188,9 @@ function FormDockPanel({
               base0D: colors.JSON_TREE_BASE_COLOR,
             }}
             labelRenderer={([key]) => (
-              <span style={{ color: getLabelColor(key) }}>{key || '.'}</span>
+              <span style={{ color: getLabelColor(key) }}>
+                {key == null || key === '' ? '.' : key}
+              </span>
             )}
             valueRenderer={(valueAsString, _value, ...keyPath) => {
               return <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>;
