@@ -1,3 +1,5 @@
+import * as colors from './colors';
+
 type FormDockHeaderProps = Readonly<{
   minimized: boolean;
   valid: boolean | null;
@@ -34,8 +36,8 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
         borderLeftStyle: 'none',
         borderRightStyle: 'none',
         borderWidth: '1px',
-        borderColor: 'oklch(70.4% 0.04 256.788)',
-        backgroundColor: 'oklch(37.2% 0.044 257.287)',
+        borderColor: colors.PANEL_HEADER_BORDER_COLOR,
+        backgroundColor: colors.PANEL_HEADER_BACKGROUND_COLOR,
         marginLeft: '-0.75rem',
         marginRight: '-0.75rem',
         cursor: 'pointer',
@@ -47,7 +49,7 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
       tabIndex={0}
       title={title}
       onFocus={(event) => {
-        event.currentTarget.style.outline = 'solid 1px oklch(83.7% 0.128 66.29)';
+        event.currentTarget.style.outline = `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}`;
       }}
       onBlur={(event) => {
         event.currentTarget.style.outline = 'none';
@@ -59,7 +61,7 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
       <span
         style={{
           top: '-0.125rem',
-          color: 'oklch(86.9% 0.022 252.894)',
+          color: colors.PANEL_HEADER_COLOR,
           fontSize: '0.75rem',
           fontWeight: 600,
           letterSpacing: '0.05rem',
@@ -73,7 +75,10 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
             display: 'inline-block',
             marginLeft: '0.3rem',
             marginTop: '-3px',
-            color: valid === false ? 'oklch(70.4% 0.191 22.216)' : 'oklch(68.1% 0.162 75.834)',
+            color:
+              valid === false
+                ? colors.PANEL_HEADER_ICON_INVALID_COLOR
+                : colors.PANEL_HEADER_ICON_UNINITIALIZED_COLOR,
             visibility: valid === true ? 'hidden' : 'visible',
           }}
           width="14"

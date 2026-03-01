@@ -6,6 +6,7 @@ import type { FormStateResponse } from 'form-state';
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 import FormDockHeader from './form-dock-header';
 import ErrorToast from './error-toast';
+import * as colors from './colors';
 
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
 
@@ -26,15 +27,15 @@ const getLabelColor = (key?: string | number) => {
 
   switch (key) {
     case 'state': {
-      color = 'oklch(79.2% 0.209 151.711)';
+      color = colors.PANEL_STATE_LABEL_COLOR;
       break;
     }
     case 'status': {
-      color = 'oklch(94.5% 0.129 101.54)';
+      color = colors.PANEL_STATUS_LABEL_COLOR;
       break;
     }
     default: {
-      color = 'oklch(87.2% 0.01 258.338)';
+      color = colors.PANEL_LABEL_COLOR;
       break;
     }
   }
@@ -46,10 +47,10 @@ const getKeyColor = (keys: KeyPath) => {
   const lastThreeKeys = keys.slice(-3);
 
   if (lastThreeKeys.length === 3 && lastThreeKeys[0] === 'errors') {
-    return 'oklch(70.4% 0.191 22.216)';
+    return colors.PANEL_ERROR_KEY_COLOR;
   }
 
-  return 'oklch(91.7% 0.08 205.041)';
+  return colors.PANEL_KEY_COLOR;
 };
 
 const getInitialSize = (collapsed: boolean) => {
@@ -137,7 +138,7 @@ function FormDockPanel({
         popover="manual"
         style={{
           position: 'fixed',
-          backgroundColor: 'rgb(0, 43, 54)',
+          backgroundColor: colors.PANEL_BACKGROUND_COLOR,
           minWidth: '100%',
           width: '100%',
           height: getHeight(),
@@ -184,14 +185,16 @@ function FormDockPanel({
             data={formObject}
             keyPath={['form']}
             theme={{
-              base0D: 'oklch(87.2% 0.01 258.338)',
+              base0D: colors.JSON_TREE_BASE_COLOR,
             }}
             labelRenderer={([key]) => <span style={{ color: getLabelColor(key) }}>{key}</span>}
             valueRenderer={(valueAsString, _value, ...keyPath) => {
               return <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>;
             }}
             getItemString={(_type, _data, _itemType, itemString) => (
-              <span style={{ color: 'oklch(67.8% 0 0)', fontSize: '0.85rem' }}>[{itemString}]</span>
+              <span style={{ color: colors.JSON_TREE_ITEM_COLOR, fontSize: '0.85rem' }}>
+                [{itemString}]
+              </span>
             )}
           />
         )}

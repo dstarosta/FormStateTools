@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
+import * as colors from './colors';
 
 type ErrorWrapper = { type: 'console' | 'thrown'; value: unknown };
 
@@ -205,13 +206,13 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
         padding: '1rem',
         zIndex: 1000,
         fontSize: '0.85rem',
-        color: '#ffffff',
-        backgroundColor: 'oklch(57.7% 0.245 27.325)',
+        color: colors.TOAST_COLOR,
+        backgroundColor: colors.TOAST_BACKGROUND_COLOR,
         maxHeight: '95%',
         minWidth: '265px',
         maxWidth: '20%',
         overflow: 'auto',
-        boxShadow: '5px 5px 5px rgba(0, 0, 0, 0.2)',
+        boxShadow: `5px 5px 5px ${colors.TOAST_SHADOW_COLOR}`,
         borderRadius: '5px',
         opacity: '0.8',
       }}
@@ -220,7 +221,7 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
         style={{
           fontSize: '14px',
           fontWeight: 600,
-          color: 'oklch(94.5% 0.129 101.54)',
+          color: colors.TOAST_HEADER_COLOR,
           position: 'relative',
           width: '100%',
         }}
@@ -231,16 +232,16 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
           tabIndex={0}
           onClick={handleClose}
           onFocus={(e) => {
-            e.currentTarget.style.outline = 'solid 2px oklch(94.5% 0.129 101.54)';
+            e.currentTarget.style.outline = `solid 2px ${colors.TOAST_OUTLINE_COLOR}`;
           }}
           onBlur={(e) => {
             e.currentTarget.style.outline = 'none';
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'oklch(94.5% 0.129 101.54)';
+            e.currentTarget.style.color = colors.TOAST_ACTIVE_COLOR;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#ffffff';
+            e.currentTarget.style.color = colors.TOAST_COLOR;
           }}
           style={{
             position: 'absolute',
@@ -254,8 +255,8 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
             outline: 0,
             outlineOffset: 1,
             borderStyle: 'none',
-            color: '#ffffff',
-            backgroundColor: 'transparent',
+            color: colors.TOAST_BUTTON_COLOR,
+            backgroundColor: colors.TOAST_BUTTON_BACKGROUND_COLOR,
           }}
         >
           <svg

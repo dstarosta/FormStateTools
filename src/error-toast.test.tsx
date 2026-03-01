@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { CapturedErrorLevel } from './form-dock';
+import * as colors from './colors';
 
 const errorEventHandler = (event: ErrorEvent) => {
   event.preventDefault();
@@ -561,7 +562,7 @@ describe('ErrorToast', async () => {
       const button = screen.getByTitle('Hide error');
       await user.hover(button);
 
-      expect(button.style.color).toBe('oklch(0.945 0.129 101.54)');
+      expect(button.style.color).toBe(colors.TOAST_HEADER_COLOR);
     });
 
     it('should reset color on mouse leave', async () => {
@@ -578,7 +579,7 @@ describe('ErrorToast', async () => {
       await user.hover(button);
       await user.unhover(button);
 
-      expect(button.style.color).toBe('rgb(255, 255, 255)');
+      expect(button.style.color).toBe(colors.TOAST_COLOR);
     });
 
     it('should have correct tabIndex', async () => {

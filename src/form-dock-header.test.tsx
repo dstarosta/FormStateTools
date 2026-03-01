@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import FormDockHeader from './form-dock-header';
+import * as colors from './colors';
 
 describe('FormDockHeader', () => {
   const defaultProps = {
@@ -92,7 +93,7 @@ describe('FormDockHeader', () => {
 
       const svg = screen.getByTitle('The form has errors.').closest('svg');
 
-      expect(svg).toHaveStyle({ color: 'oklch(70.4% 0.191 22.216)' });
+      expect(svg).toHaveStyle({ color: colors.PANEL_HEADER_ICON_INVALID_COLOR });
     });
 
     it('should have warning color when valid is null', () => {
@@ -100,7 +101,7 @@ describe('FormDockHeader', () => {
 
       const svg = screen.getByTitle('The form has not been validated.').closest('svg');
 
-      expect(svg).toHaveStyle({ color: 'oklch(68.1% 0.162 75.834)' });
+      expect(svg).toHaveStyle({ color: colors.PANEL_HEADER_ICON_UNINITIALIZED_COLOR });
     });
 
     it('should have correct title when valid is false', () => {
@@ -314,7 +315,7 @@ describe('FormDockHeader', () => {
 
       await user.tab();
 
-      expect(button).toHaveStyle({ outline: 'solid 1px oklch(83.7% 0.128 66.29)' });
+      expect(button).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
     });
 
     it('should remove outline on blur', async () => {
@@ -329,7 +330,7 @@ describe('FormDockHeader', () => {
       const button = screen.getByRole('button', { name: /form tools/i });
 
       await user.tab();
-      expect(button).toHaveStyle({ outline: 'solid 1px oklch(83.7% 0.128 66.29)' });
+      expect(button).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
 
       await user.tab();
       expect(button).toHaveStyle({ outline: 'none' });
