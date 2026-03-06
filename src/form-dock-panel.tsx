@@ -192,9 +192,9 @@ function FormDockPanel({
                 {key == null || key === '' ? '.' : key}
               </span>
             )}
-            valueRenderer={(valueAsString, _value, ...keyPath) => {
-              return <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>;
-            }}
+            valueRenderer={(valueAsString, _value, ...keyPath) => (
+              <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>
+            )}
             getItemString={(_type, _data, _itemType, itemString) => (
               <span style={{ color: colors.JSON_TREE_ITEM_COLOR, fontSize: '0.85rem' }}>
                 [{itemString}]
