@@ -25,7 +25,7 @@ const AppDockPanel = (props: Omit<FormDockPanelProps, 'form'>) => {
 };
 
 const AppDockPanelWithErrors = (props: Omit<FormDockPanelProps, 'form'>) => {
-  const form = useFormState(formSchema, { validateOnInit: true });
+  const form = useFormState(formSchema, { validateOnMount: true });
 
   return <FormDockPanel {...props} form={form} />;
 };
