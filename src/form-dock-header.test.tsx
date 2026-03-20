@@ -21,13 +21,13 @@ describe('FormDockHeader', () => {
     it('should render with collapse text when not minimized', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      expect(screen.getByText(/COLLAPSE FORM TOOLS/i)).toBeInTheDocument();
+      expect(screen.getByText(/collapse form tools/i)).toBeInTheDocument();
     });
 
     it('should render with expand text when minimized', () => {
       render(<FormDockHeader {...defaultProps} minimized={true} />);
 
-      expect(screen.getByText(/EXPAND FORM TOOLS/i)).toBeInTheDocument();
+      expect(screen.getByText(/expand form tools/i)).toBeInTheDocument();
     });
 
     it('should have correct title when not minimized', () => {
@@ -66,7 +66,7 @@ describe('FormDockHeader', () => {
       render(<FormDockHeader {...defaultProps} valid={true} />);
 
       const svg = screen
-        .getByTitle(/The form has not been validated|The form has errors/i)
+        .getByTitle(/the form has not been validated|the form has errors/i)
         .closest('svg');
 
       expect(svg).toHaveStyle({ visibility: 'hidden' });
@@ -137,7 +137,9 @@ describe('FormDockHeader', () => {
 
     it('should call onRightClick when right-clicked', async () => {
       const user = userEvent.setup();
-      const onRightClick = vi.fn((e: React.SyntheticEvent) => e.preventDefault());
+      const onRightClick = vi.fn((e: React.SyntheticEvent) => {
+        e.preventDefault();
+      });
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
@@ -403,15 +405,15 @@ describe('FormDockHeader', () => {
     it('should maintain state consistency when props change', () => {
       const { rerender } = render(<FormDockHeader {...defaultProps} minimized={false} />);
 
-      expect(screen.getByText(/COLLAPSE FORM TOOLS/i)).toBeInTheDocument();
+      expect(screen.getByText(/collapse form tools/i)).toBeInTheDocument();
 
       rerender(<FormDockHeader {...defaultProps} minimized={true} />);
 
-      expect(screen.getByText(/EXPAND FORM TOOLS/i)).toBeInTheDocument();
+      expect(screen.getByText(/expand form tools/i)).toBeInTheDocument();
 
       rerender(<FormDockHeader {...defaultProps} minimized={false} />);
 
-      expect(screen.getByText(/COLLAPSE FORM TOOLS/i)).toBeInTheDocument();
+      expect(screen.getByText(/collapse form tools/i)).toBeInTheDocument();
     });
 
     it('should update validation icon when valid prop changes', () => {
@@ -457,7 +459,9 @@ describe('FormDockHeader', () => {
   describe('Edge Cases', () => {
     it('should handle onClick and onRightClick being the same function', async () => {
       const user = userEvent.setup();
-      const handler = vi.fn((e: React.SyntheticEvent) => e.preventDefault());
+      const handler = vi.fn((e: React.SyntheticEvent) => {
+        e.preventDefault();
+      });
 
       render(<FormDockHeader {...defaultProps} onClick={handler} onRightClick={handler} />);
 

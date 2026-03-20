@@ -97,9 +97,7 @@ function FormDock({
 
   if (
     devMode === true ||
-    (typeof process === 'object' &&
-      process.env &&
-      process.env['NODE_ENV']?.toLowerCase() === 'development')
+    (typeof process === 'object' && process.env['NODE_ENV']?.toLowerCase() === 'development')
   ) {
     return (
       <FormDockPanel

@@ -19,8 +19,7 @@ export type FormDockPanelProps = Readonly<{
 
 const FORM_SIZE_KEY = '__form-dock-size';
 
-const HAS_SESSION_STORAGE =
-  typeof globalThis.sessionStorage === 'object' && globalThis.sessionStorage != null;
+const HAS_SESSION_STORAGE = typeof globalThis.sessionStorage === 'object';
 
 const getLabelColor = (key?: string | number) => {
   let color: string;
@@ -203,7 +202,7 @@ function FormDockPanel({
           />
         )}
       </aside>
-      {captureErrors && (
+      {captureErrors !== 'none' && (
         <ErrorToast captureErrors={captureErrors} ignoreErrorPatterns={ignoreErrorPatterns} />
       )}
     </>

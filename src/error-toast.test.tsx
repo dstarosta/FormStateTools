@@ -53,7 +53,7 @@ describe('ErrorToast', async () => {
       console.error(() => {});
 
       await waitFor(() => {
-        expect(screen.getByText(/ConsoleError: \[function\]/)).toBeInTheDocument();
+        expect(screen.getByText(/ConsoleError: \[function]/)).toBeInTheDocument();
       });
     });
 
@@ -64,7 +64,7 @@ describe('ErrorToast', async () => {
       console.error(promise);
 
       await waitFor(() => {
-        expect(screen.getByText(/ConsoleError: \[Promise\]/)).toBeInTheDocument();
+        expect(screen.getByText(/ConsoleError: \[Promise]/)).toBeInTheDocument();
       });
     });
 
@@ -121,7 +121,7 @@ describe('ErrorToast', async () => {
       console.error(circular);
 
       await waitFor(() => {
-        expect(screen.getByText(/\[object Object\]/)).toBeInTheDocument();
+        expect(screen.getByText(/\[object Object]/)).toBeInTheDocument();
       });
     });
 
@@ -651,7 +651,9 @@ describe('ErrorToast', async () => {
     it('should handle cleanup when dialog ref is null', () => {
       const { unmount } = render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
-      expect(() => unmount()).not.toThrow();
+      expect(() => {
+        unmount();
+      }).not.toThrow();
     });
   });
 
@@ -741,7 +743,9 @@ describe('ErrorToast', async () => {
     it('should handle dialog ref being null', () => {
       render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
-      expect(() => console.error('test')).not.toThrow();
+      expect(() => {
+        console.error('test');
+      }).not.toThrow();
     });
   });
 
@@ -885,7 +889,7 @@ describe('ErrorToast', async () => {
 
     it('should handle RegExp with flags', () => {
       const { container } = render(
-        <ErrorToast captureErrors="console" ignoreErrorPatterns={[/ERROR/i]} />
+        <ErrorToast captureErrors="console" ignoreErrorPatterns={[/error/i]} />
       );
 
       console.error('error in lowercase');
