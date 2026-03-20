@@ -88,7 +88,7 @@ function FormDockPanel({
   const [size, setSize] = useState<FormDockSize>(getInitialSize(collapsed));
 
   const formJSON = JSON.stringify({
-    initiailState: form.initialState,
+    initialState: form.initialState,
     state: form.formState,
     status: form.formStatus,
   });
