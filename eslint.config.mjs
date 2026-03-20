@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import sonarjs from 'eslint-plugin-sonarjs';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -16,6 +17,8 @@ export default defineConfig([
       tseslint.configs.strictTypeChecked,
       eslintPluginUnicorn.configs.all,
       sonarjs.configs.recommended,
+      react.configs.flat.recommended,
+      react.configs.flat['jsx-runtime'],
       reactHooks.configs.flat.recommended,
       eslintConfigPrettier,
     ],
@@ -43,6 +46,8 @@ export default defineConfig([
       'use-isnan': 'error',
       // TS rules
       '@typescript-eslint/no-dynamic-delete': 'off', // mutable state objects cannot be replaced with Maps due to Zod and strongly typed paths
+      // React rules
+      'react/no-unknown-property': ['error', { ignore: ['closedby'] }],
       // Annoying Sonar rules
       'sonarjs/cognitive-complexity': 'off', // reducers and schema visitors are difficult to break up into _readable_ small functions
       'sonarjs/function-return-type': 'off', // different return types (ex: discriminated unions) are not an issue

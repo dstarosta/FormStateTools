@@ -93,7 +93,7 @@ describe('FormDock', () => {
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary');
+      const panelNode = getByRole('complementary', { hidden: true });
       const headerNode = getByText('EXPAND FORM TOOLS');
 
       expect(panelNode.style.height).toBe('1.125rem');
@@ -109,7 +109,7 @@ describe('FormDock', () => {
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary');
+      const panelNode = getByRole('complementary', { hidden: true });
       const headerNode = getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
@@ -125,7 +125,7 @@ describe('FormDock', () => {
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary');
+      const panelNode = getByRole('complementary', { hidden: true });
       const headerNode = getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
@@ -146,7 +146,7 @@ describe('FormDock', () => {
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary');
+      const panelNode = getByRole('complementary', { hidden: true });
       const headerNode = getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
