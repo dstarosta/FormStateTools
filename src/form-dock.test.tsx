@@ -6,9 +6,9 @@ import { useFormState, z } from 'form-state';
 import FormDock, { type FormDockProps } from './form-dock';
 
 const formSchema = z.object({
-  id: z.formNumber(z.number(), { required: true }),
-  name: z.formString(z.string(), { required: true }),
-  age: z.formNumber(z.number()),
+  id: z.formNumber({ required: true }),
+  name: z.formString({ required: true }),
+  age: z.formNumber(),
 });
 
 const AppForm = (props: Omit<FormDockProps, 'form'>) => {
