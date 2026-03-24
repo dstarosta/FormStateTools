@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { useFormState, z } from 'form-state';
 
@@ -25,34 +25,34 @@ describe('FormDock', () => {
   it('renders FormDock in development mode', () => {
     vi.stubEnv('NODE_ENV', 'development');
 
-    const { getByText } = render(<AppForm />);
+    render(<AppForm />);
 
-    expect(getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+    expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
   });
 
   it('does not render FormDock in production mode', () => {
     vi.stubEnv('NODE_ENV', 'production');
 
-    const { queryByText } = render(<AppForm />);
+    render(<AppForm />);
 
-    expect(queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+    expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
   });
 
   it('does not render FormDock in unspecified mode', () => {
-    const { queryByText } = render(<AppForm />);
+    render(<AppForm />);
 
-    expect(queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+    expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
   });
 
   it('does renders FormDock in implicit dev mode', () => {
-    const { getByText } = render(<AppForm devMode />);
+    render(<AppForm devMode />);
 
-    expect(getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+    expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
   });
 
   it('does not render FormDock in implicit non-dev mode', () => {
-    const { queryByText } = render(<AppForm devMode={false} />);
+    render(<AppForm devMode={false} />);
 
-    expect(queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+    expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
   });
 });

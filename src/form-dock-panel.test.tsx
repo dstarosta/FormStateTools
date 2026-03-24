@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { useFormState, z } from 'form-state';
 
@@ -33,133 +33,129 @@ const AppDockPanelWithErrors = (props: Omit<FormDockPanelProps, 'form'>) => {
 describe('FormDock', () => {
   describe('Rendering', () => {
     it('renders FormDockPanel in minimized mode', () => {
-      const { getByText } = render(<AppDockPanel {...defaultProps} />);
+      render(<AppDockPanel {...defaultProps} />);
 
-      expect(getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
     });
 
     it('renders FormDockPanel in implicit minimized mode', () => {
-      const { getByText } = render(<AppDockPanel {...defaultProps} collapsed />);
+      render(<AppDockPanel {...defaultProps} collapsed />);
 
-      expect(getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
     });
 
     it('renders FormDockPanel in normal mode', () => {
-      const { getByText } = render(<AppDockPanel {...defaultProps} collapsed={false} />);
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
     });
 
     it('renders FormDockPanel in normal mode', async () => {
-      const { getByText, queryByText } = render(
-        <AppDockPanel {...defaultProps} collapsed={false} />
-      );
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();
 
-      const stateNode = getByText('state');
+      const stateNode = screen.getByText('state');
       await user.click(stateNode);
 
-      const dataNode = getByText('data');
+      const dataNode = screen.getByText('data');
       await user.click(dataNode);
 
-      expect(queryByText('id')).toBeInTheDocument();
-      expect(queryByText('name')).toBeInTheDocument();
-      expect(queryByText('age')).toBeInTheDocument();
+      expect(screen.getByText('id')).toBeInTheDocument();
+      expect(screen.getByText('name')).toBeInTheDocument();
+      expect(screen.getByText('age')).toBeInTheDocument();
     });
 
     it('renders FormDockPanel with errors', async () => {
-      const { getByText, queryByText } = render(
-        <AppDockPanelWithErrors {...defaultProps} collapsed={false} />
-      );
+      render(<AppDockPanelWithErrors {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();
 
-      const stateNode = getByText('state');
+      const stateNode = screen.getByText('state');
       await user.click(stateNode);
 
-      const dataNode = getByText('errors');
+      const dataNode = screen.getByText('errors');
       await user.click(dataNode);
 
-      expect(queryByText('id')).toBeInTheDocument();
-      expect(queryByText('name')).toBeInTheDocument();
-      expect(queryByText('age')).not.toBeInTheDocument();
+      expect(screen.getByText('id')).toBeInTheDocument();
+      expect(screen.getByText('name')).toBeInTheDocument();
+      expect(screen.queryByText('age')).not.toBeInTheDocument();
     });
   });
 
   describe('Modes', () => {
     it('switches FormDockPanel to from minimized to normal mode by clicking', async () => {
-      const { getByRole, getByText } = render(<AppDockPanel {...defaultProps} />);
+      render(<AppDockPanel {...defaultProps} />);
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary', { hidden: true });
-      const headerNode = getByText('EXPAND FORM TOOLS');
+      const panelNode = screen.getByRole('complementary', { hidden: true });
+      const headerNode = screen.getByText('EXPAND FORM TOOLS');
 
       expect(panelNode.style.height).toBe('1.125rem');
 
       await user.click(headerNode);
 
       expect(panelNode.style.height).toBe('30vh');
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
     });
 
     it('switches FormDockPanel to from normal to minimized mode by clicking', async () => {
-      const { getByRole, getByText } = render(<AppDockPanel {...defaultProps} collapsed={false} />);
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary', { hidden: true });
-      const headerNode = getByText('COLLAPSE FORM TOOLS');
+      const panelNode = screen.getByRole('complementary', { hidden: true });
+      const headerNode = screen.getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
 
       await user.click(headerNode);
 
       expect(panelNode.style.height).toBe('1.125rem');
-      expect(getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
     });
 
     it('switches FormDockPanel to from normal to maximized mode, and back to normal, by right clicking', async () => {
-      const { getByRole, getByText } = render(<AppDockPanel {...defaultProps} collapsed={false} />);
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary', { hidden: true });
-      const headerNode = getByText('COLLAPSE FORM TOOLS');
+      const panelNode = screen.getByRole('complementary', { hidden: true });
+      const headerNode = screen.getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
 
       await user.pointer({ keys: '[MouseRight]', target: headerNode });
 
       expect(panelNode.style.height).toBe('100vh');
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
 
       await user.pointer({ keys: '[MouseRight]', target: headerNode });
 
       expect(panelNode.style.height).toBe('30vh');
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
     });
 
     it('switches FormDockPanel to from normal to maximized mode, then to minimized left clicking', async () => {
-      const { getByRole, getByText } = render(<AppDockPanel {...defaultProps} collapsed={false} />);
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();
 
-      const panelNode = getByRole('complementary', { hidden: true });
-      const headerNode = getByText('COLLAPSE FORM TOOLS');
+      const panelNode = screen.getByRole('complementary', { hidden: true });
+      const headerNode = screen.getByText('COLLAPSE FORM TOOLS');
 
       expect(panelNode.style.height).toBe('30vh');
 
       await user.pointer({ keys: '[MouseRight]', target: headerNode });
 
       expect(panelNode.style.height).toBe('100vh');
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
 
       await user.click(headerNode);
 
       expect(panelNode.style.height).toBe('30vh');
-      expect(getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
+      expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
     });
   });
 });
