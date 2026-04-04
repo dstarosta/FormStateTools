@@ -25,7 +25,7 @@ export default defineConfig([
       eslintConfigPrettier,
     ],
     languageOptions: {
-      ecmaVersion: 2023,
+      ecmaVersion: 2022,
       globals: globals.browser,
       parserOptions: {
         projectService: true,
