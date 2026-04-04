@@ -1,4 +1,4 @@
-import * as react_jsx_runtime0 from "react/jsx-runtime";
+import * as _$react_jsx_runtime0 from "react/jsx-runtime";
 import * as z from "zod/mini";
 import { FormStateResponse } from "form-state";
 
@@ -85,7 +85,7 @@ declare function FormDock({
   collapsed,
   captureErrors,
   ignoreErrorPatterns
-}: FormDockProps): react_jsx_runtime0.JSX.Element | null;
+}: FormDockProps): _$react_jsx_runtime0.JSX.Element | null;
 //#endregion
 export { FormDock };
 //# sourceMappingURL=index.d.ts.map
