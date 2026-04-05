@@ -19,7 +19,7 @@ const defaultProps: Omit<FormDockPanelProps, 'form'> = {
 };
 
 const AppDockPanel = (props: Omit<FormDockPanelProps, 'form'>) => {
-  const form = useFormState(formSchema, { initialState: { id: 1, name: 'Mike Johnson', age: 50 } });
+  const form = useFormState(formSchema, { initialData: { id: 1, name: 'Mike Johnson', age: 50 } });
 
   return <FormDockPanel {...props} form={form} />;
 };
