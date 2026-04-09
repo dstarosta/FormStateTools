@@ -79,6 +79,21 @@ const initializeRef = (element: HTMLElement | null) => {
   }
 };
 
+const sortObject = <T,>(obj: T): T => {
+  if (!obj || typeof obj !== 'object') {
+    return obj;
+  }
+  const sortedKeys = Object.keys(obj).sort((a, b) => a.localeCompare(b));
+  const result = {} as Record<string, unknown>;
+
+  for (const key of sortedKeys) {
+    const value = (obj as Record<string, unknown>)[key];
+    result[key] = sortObject(value);
+  }
+
+  return result as T;
+};
+
 function FormDockPanel({
   form,
   collapsed,
@@ -88,11 +103,15 @@ function FormDockPanel({
   const [size, setSize] = useState<FormDockSize>(getInitialSize(collapsed));
 
   const formJSON = JSON.stringify({
-    initialState: form.initialState,
-    state: form.formState,
-    status: form.formStatus,
+    initialState: sortObject(form.initialState),
+    state: sortObject(form.formState),
+    status: sortObject(form.formStatus),
   });
-  const formObject = JSON.parse(formJSON) as object;
+  const formObject = Object.fromEntries(
+    Object.entries(JSON.parse(formJSON) as object).sort(([key1], [key2]) => {
+      return key1.localeCompare(key2);
+    })
+  );
 
   const getHeight = () => {
     switch (size) {
