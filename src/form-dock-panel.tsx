@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { type KeyPath, JSONTree } from 'react-json-tree';
 import type * as z from 'zod/mini';
 import type { FormStateResponse } from 'form-state';
@@ -18,28 +18,34 @@ export type FormDockPanelProps = Readonly<{
 }>;
 
 const FORM_SIZE_KEY = '__form-dock-size';
+const VALID_SIZES = new Set<FormDockSize>(['minimized', 'normal', 'maximized']);
 
-const HAS_SESSION_STORAGE = typeof globalThis.sessionStorage === 'object';
+const hasSessionStorage = () => typeof globalThis.sessionStorage === 'object';
+
+const SIZE_TO_HEIGHT: Record<FormDockSize, string> = {
+  minimized: '1.125rem',
+  normal: '30vh',
+  maximized: '100vh',
+};
+
+const SIZE_TO_BODY_MARGIN: Record<FormDockSize, string> = {
+  minimized: '2.5rem',
+  normal: '33vh',
+  maximized: '0',
+};
 
 const getLabelColor = (key?: string | number) => {
-  let color: string;
-
   switch (key) {
     case 'state': {
-      color = colors.PANEL_STATE_LABEL_COLOR;
-      break;
+      return colors.PANEL_STATE_LABEL_COLOR;
     }
     case 'status': {
-      color = colors.PANEL_STATUS_LABEL_COLOR;
-      break;
+      return colors.PANEL_STATUS_LABEL_COLOR;
     }
     default: {
-      color = colors.PANEL_LABEL_COLOR;
-      break;
+      return colors.PANEL_LABEL_COLOR;
     }
   }
-
-  return color;
 };
 
 const getKeyColor = (keys: KeyPath) => {
@@ -52,18 +58,18 @@ const getKeyColor = (keys: KeyPath) => {
   return colors.PANEL_KEY_COLOR;
 };
 
-const getInitialSize = (collapsed: boolean) => {
-  const storedSize = HAS_SESSION_STORAGE ? sessionStorage.getItem(FORM_SIZE_KEY) : null;
+const getInitialSize = (collapsed: boolean): FormDockSize => {
+  const storedSize = hasSessionStorage() ? sessionStorage.getItem(FORM_SIZE_KEY) : null;
 
-  if (typeof storedSize === 'string' && storedSize.length > 0) {
+  if (typeof storedSize === 'string' && VALID_SIZES.has(storedSize as FormDockSize)) {
     return storedSize as FormDockSize;
   }
 
   return collapsed ? 'minimized' : 'normal';
 };
 
-const setInitialSize = (size: FormDockSize) => {
-  if (HAS_SESSION_STORAGE) {
+const setStoredSize = (size: FormDockSize) => {
+  if (hasSessionStorage()) {
     sessionStorage.setItem(FORM_SIZE_KEY, size);
   }
 };
@@ -80,7 +86,7 @@ const initializeRef = (element: HTMLElement | null) => {
 };
 
 const sortObject = <T,>(obj: T): T => {
-  if (!obj || typeof obj !== 'object') {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
     return obj;
   }
   const sortedKeys = Object.keys(obj).sort((a, b) => a.localeCompare(b));
@@ -94,60 +100,77 @@ const sortObject = <T,>(obj: T): T => {
   return result as T;
 };
 
+const renderLabel = ([key]: KeyPath) => (
+  <span style={{ color: getLabelColor(key) }}>{key === undefined || key === '' ? '.' : key}</span>
+);
+
+const renderValue = (valueAsString: unknown, _value: unknown, ...keyPath: KeyPath) => (
+  <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>
+);
+
+const renderItemString = (
+  _type: unknown,
+  _data: unknown,
+  _itemType: React.ReactNode,
+  itemString: React.ReactNode
+) => (
+  <span style={{ color: colors.JSON_TREE_ITEM_COLOR, fontSize: '0.85rem' }}>[{itemString}]</span>
+);
+
 function FormDockPanel({
   form,
   collapsed,
   captureErrors,
   ignoreErrorPatterns,
 }: FormDockPanelProps) {
-  const [size, setSize] = useState<FormDockSize>(getInitialSize(collapsed));
+  const [size, setSize] = useState<FormDockSize>(() => getInitialSize(collapsed));
 
-  const formJSON = JSON.stringify({
-    initialState: sortObject(form.initialState),
-    state: sortObject(form.formState),
-    status: sortObject(form.formStatus),
-  });
-  const formObject = Object.fromEntries(
-    Object.entries(JSON.parse(formJSON) as object).sort(([key1], [key2]) => {
-      return key1.localeCompare(key2);
-    })
-  );
+  const formObject = useMemo(() => {
+    return sortObject(
+      JSON.parse(
+        JSON.stringify({
+          initialState: form.initialState,
+          state: form.formState,
+          status: form.formStatus,
+        })
+      ) as Record<string, unknown>
+    );
+  }, [form]);
 
-  const getHeight = () => {
-    switch (size) {
-      case 'minimized': {
-        return '1.125rem';
-      }
-      case 'maximized': {
-        return '100vh';
-      }
-      default: {
-        return '30vh';
-      }
-    }
-  };
+  useEffect(() => {
+    const prevMargin = document.body.style.marginBottom;
+    const prevOverflow = document.body.style.overflowY;
 
-  const handleClick = (event: React.SyntheticEvent) => {
+    document.body.style.overflowY = 'auto';
+    document.body.style.marginBottom = SIZE_TO_BODY_MARGIN[size];
+
+    return () => {
+      document.body.style.marginBottom = prevMargin;
+      document.body.style.overflowY = prevOverflow;
+    };
+  }, [size]);
+
+  const handleClick = useCallback((event: React.SyntheticEvent) => {
     event.preventDefault();
 
     setSize((prev) => {
       const nextSize = prev === 'normal' ? 'minimized' : 'normal';
-      setInitialSize(nextSize);
+      setStoredSize(nextSize);
 
       return nextSize;
     });
-  };
+  }, []);
 
-  const handleRightClick = (event: React.SyntheticEvent) => {
+  const handleRightClick = useCallback((event: React.SyntheticEvent) => {
     event.preventDefault();
 
     setSize((prev) => {
       const nextSize = prev === 'maximized' ? 'normal' : 'maximized';
-      setInitialSize(nextSize);
+      setStoredSize(nextSize);
 
       return nextSize;
     });
-  };
+  }, []);
 
   return (
     <>
@@ -159,7 +182,7 @@ function FormDockPanel({
           backgroundColor: colors.PANEL_BACKGROUND_COLOR,
           minWidth: '100%',
           width: '100%',
-          height: getHeight(),
+          height: SIZE_TO_HEIGHT[size],
           paddingLeft: '0.75rem',
           paddingRight: '0.75rem',
           overflow: 'auto',
@@ -168,30 +191,6 @@ function FormDockPanel({
           bottom: 0,
         }}
       >
-        {size === 'maximized' && (
-          <style>{`
-            body {
-              overflow-y: auto;
-              margin-bottom: 0;
-            }
-          `}</style>
-        )}
-        {size === 'minimized' && (
-          <style>{`
-            body {
-              overflow-y: auto;
-              margin-bottom: 2.5rem;
-            }
-          `}</style>
-        )}
-        {size === 'normal' && (
-          <style>{`
-            body {
-              overflow-y: auto;
-              margin-bottom: 33vh;
-            }
-          `}</style>
-        )}
         <FormDockHeader
           minimized={size === 'minimized'}
           valid={form.formStatus.valid}
@@ -205,19 +204,9 @@ function FormDockPanel({
             theme={{
               base0D: colors.JSON_TREE_BASE_COLOR,
             }}
-            labelRenderer={([key]) => (
-              <span style={{ color: getLabelColor(key) }}>
-                {key == null || key === '' ? '.' : key}
-              </span>
-            )}
-            valueRenderer={(valueAsString, _value, ...keyPath) => (
-              <span style={{ color: getKeyColor(keyPath) }}>{String(valueAsString)}</span>
-            )}
-            getItemString={(_type, _data, _itemType, itemString) => (
-              <span style={{ color: colors.JSON_TREE_ITEM_COLOR, fontSize: '0.85rem' }}>
-                [{itemString}]
-              </span>
-            )}
+            labelRenderer={renderLabel}
+            valueRenderer={renderValue}
+            getItemString={renderItemString}
           />
         )}
       </aside>

@@ -61,6 +61,7 @@ export default defineConfig([
       'unicorn/no-useless-undefined': ['error', { checkArguments: false }], // you cannot omit function arguments in strict TS (in tests)
       'unicorn/numeric-separators-style': 'off', // always forcing underscores in numeric constants makes no sense
       'unicorn/prefer-string-replace-all': 'off', // replace(/[set of numbers]/g) is way more terse for fallback GUID generation
+      'unicorn/prefer-structured-clone': 'off', // it cannot clone objects with functions
       'unicorn/prevent-abbreviations': 'off', // "ref" and "args" abbreviations are commonly used
       // Testing rules
       'testing-library/no-node-access': 'off', // dialog and svg elements are not easy to find with a role
