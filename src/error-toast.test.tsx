@@ -2,7 +2,6 @@ import { describe, it, expect, afterAll, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import type { CapturedErrorLevel } from './form-dock';
 import * as colors from './colors';
 
 const errorEventHandler = (event: ErrorEvent) => {
@@ -330,9 +329,7 @@ describe('ErrorToast', async () => {
     });
 
     it('should handle captureErrors value of "none" type', () => {
-      const { container } = render(
-        <ErrorToast captureErrors={'none' as CapturedErrorLevel} ignoreErrorPatterns={[]} />
-      );
+      const { container } = render(<ErrorToast captureErrors="none" ignoreErrorPatterns={[]} />);
 
       console.error('should not capture');
       const error = new Error('should not capture');
