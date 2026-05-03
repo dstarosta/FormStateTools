@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
+import formState from 'form-state/eslint';
 import sonarjs from 'eslint-plugin-sonarjs';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -17,6 +18,7 @@ export default defineConfig([
       js.configs.recommended,
       tseslint.configs.strictTypeChecked,
       eslintPluginUnicorn.configs.all,
+      formState.configs.recommended,
       sonarjs.configs.recommended,
       react.configs.flat.recommended,
       react.configs.flat['jsx-runtime'],
