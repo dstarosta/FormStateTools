@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { type KeyPath, JSONTree } from 'react-json-tree';
+import { JSONTree, type KeyPath } from 'react-json-tree';
 import type * as z from 'zod/mini';
 import type { FormStateResponse } from 'form-state';
 
