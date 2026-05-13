@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import type * as z from 'zod/mini';
 import { type FormStateResponse } from 'form-state';
 
@@ -91,7 +92,15 @@ function FormDock({
   captureErrors = 'all',
   ignoreErrorPatterns = EmptyErrorPatterns,
 }: FormDockProps) {
-  if (devMode === false) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // SSR workaround
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  if (devMode === false || !isMounted) {
     return null;
   }
 

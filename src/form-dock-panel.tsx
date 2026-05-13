@@ -189,6 +189,9 @@ function FormDockPanel({
           left: 0,
           top: 'auto',
           bottom: 0,
+          fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+          fontSize: '14px',
+          lineHeight: 1.8,
         }}
       >
         <FormDockHeader
