@@ -22,6 +22,7 @@ const getPopupFeatures = (host: Window): string => {
   const width = Math.round(availWidth * POPUP_WIDTH_RATIO);
   const left = Math.round((availWidth - width) / 2);
   const top = Math.round((availHeight - POPUP_HEIGHT) / 2);
+
   return `popup,width=${String(width)},height=${String(POPUP_HEIGHT)},left=${String(left)},top=${String(top)}`;
 };
 
@@ -40,16 +41,19 @@ const copyStyles = (source: Document, target: Document) => {
         style.setAttribute('id', ownerNode.id);
       }
       style.textContent = cssRules;
+
       target.head.append(style);
     } catch {
       if (!styleSheet.href) {
         continue;
       }
+
       const link = target.createElement('link');
       link.rel = 'stylesheet';
       link.type = styleSheet.type;
       link.media = styleSheet.media.toString();
       link.href = styleSheet.href;
+
       target.head.append(link);
     }
   }
@@ -126,8 +130,10 @@ function PopupPortal({ onClose, children }: PopupPortalProps) {
 
     return () => {
       activeMounts--;
+
       active.window.removeEventListener('pagehide', handlePopupClose);
       host.removeEventListener('beforeunload', handleHostUnload);
+
       setTarget(null);
 
       // Defer the close. If StrictMode (or a re-render) re-mounts us within
