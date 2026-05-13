@@ -1,13 +1,23 @@
 import * as colors from './colors';
+import { AttachIcon, DetachIcon, WarningIcon } from './icons';
 
 type FormDockHeaderProps = Readonly<{
   minimized: boolean;
+  detached: boolean;
   valid: boolean | null;
   onClick: (event: React.SyntheticEvent) => void;
   onRightClick: (event: React.SyntheticEvent) => void;
+  onToggleDetach: (event: React.SyntheticEvent) => void;
 }>;
 
-function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHeaderProps) {
+function FormDockHeader({
+  minimized,
+  detached,
+  valid,
+  onClick,
+  onRightClick,
+  onToggleDetach,
+}: FormDockHeaderProps) {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.altKey || event.ctrlKey || event.shiftKey) {
       return;
@@ -19,18 +29,25 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
     }
   };
 
-  const title = `Click to ${minimized ? 'expand' : 'collapse'} the form tools panel. Right mouse click maximizes the panel.`;
+  const sizeAction = minimized ? 'expand' : 'collapse';
+
+  const label = detached ? 'FORM TOOLS DETACHED' : `${sizeAction.toUpperCase()} FORM TOOLS`;
+
+  const title = detached
+    ? 'Click to re-attach the form tools panel.'
+    : `Click to ${sizeAction} the form tools panel. Right mouse click maximizes the panel.`;
+
+  const detachTitle = detached ? 'Attach panel' : 'Detach panel into a separate window';
 
   return (
     <div
       style={{
         display: 'flex',
         position: 'sticky',
-        height: '1rem',
+        height: '1.5rem',
         top: 0,
         zIndex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'stretch',
         borderTopStyle: 'solid',
         borderBottomStyle: 'solid',
         borderLeftStyle: 'none',
@@ -40,64 +57,88 @@ function FormDockHeader({ minimized, valid, onClick, onRightClick }: FormDockHea
         backgroundColor: colors.PANEL_HEADER_BACKGROUND_COLOR,
         marginLeft: '-0.75rem',
         marginRight: '-0.75rem',
-        cursor: 'pointer',
-        outline: 'none',
-        outlineOffset: -1,
         userSelect: 'none',
       }}
-      role="button"
-      tabIndex={0}
-      title={title}
-      onFocus={(event) => {
-        event.currentTarget.style.outline = `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}`;
-      }}
-      onBlur={(event) => {
-        event.currentTarget.style.outline = 'none';
-      }}
-      onClick={onClick}
-      onContextMenu={onRightClick}
-      onKeyDown={handleKeyPress}
     >
-      <span
+      <button
+        type="button"
+        title={detachTitle}
+        aria-label={detachTitle}
+        onClick={(event) => {
+          event.stopPropagation();
+          onToggleDetach(event);
+        }}
+        onFocus={(event) => {
+          event.currentTarget.style.outline = `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}`;
+        }}
+        onBlur={(event) => {
+          event.currentTarget.style.outline = 'none';
+        }}
         style={{
-          top: '-0.125rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '2.25rem',
+          padding: 0,
+          margin: 0,
+          border: 'none',
+          outline: 'none',
+          outlineOffset: -1,
+          cursor: 'pointer',
           color: colors.PANEL_HEADER_COLOR,
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          letterSpacing: '0.05rem',
-          marginRight: '5%',
+          backgroundColor: 'transparent',
         }}
       >
-        {minimized ? 'EXPAND' : 'COLLAPSE'} FORM TOOLS
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
+        {detached ? <AttachIcon /> : <DetachIcon />}
+      </button>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          outline: 'none',
+          outlineOffset: -1,
+        }}
+        role="button"
+        tabIndex={0}
+        title={title}
+        onFocus={(event) => {
+          event.currentTarget.style.outline = `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}`;
+        }}
+        onBlur={(event) => {
+          event.currentTarget.style.outline = 'none';
+        }}
+        onClick={onClick}
+        onContextMenu={onRightClick}
+        onKeyDown={handleKeyPress}
+      >
+        <span
           style={{
-            display: 'inline-block',
-            marginLeft: '0.3rem',
-            marginTop: '-3px',
-            color:
-              valid === false
-                ? colors.PANEL_HEADER_ICON_INVALID_COLOR
-                : colors.PANEL_HEADER_ICON_UNINITIALIZED_COLOR,
-            visibility: valid === true ? 'hidden' : 'visible',
+            top: '-0.125rem',
+            color: colors.PANEL_HEADER_COLOR,
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            letterSpacing: '0.05rem',
           }}
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
         >
-          <title>
-            {valid === null ? 'The form has not been validated.' : 'The form has errors.'}
-          </title>
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" x2="12" y1="8" y2="12" />
-          <line x1="12" x2="12.01" y1="16" y2="16" />
-        </svg>
-      </span>
+          {label}
+          <WarningIcon
+            style={{
+              display: 'inline-block',
+              marginLeft: '0.3rem',
+              marginTop: '-3px',
+              color:
+                valid === false
+                  ? colors.PANEL_HEADER_ICON_INVALID_COLOR
+                  : colors.PANEL_HEADER_ICON_UNINITIALIZED_COLOR,
+              visibility: valid === true ? 'hidden' : 'visible',
+            }}
+            title={valid === null ? 'The form has not been validated.' : 'The form has errors.'}
+          />
+        </span>
+      </div>
     </div>
   );
 }

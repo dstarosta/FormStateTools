@@ -5,12 +5,17 @@ import userEvent from '@testing-library/user-event';
 import FormDockHeader from './form-dock-header';
 import * as colors from './colors';
 
+const getStrip = () => screen.getByRole('button', { name: /form tools/i });
+const getDetachButton = () => screen.getByRole('button', { name: /^(detach|attach) panel/i });
+
 describe('FormDockHeader', () => {
   const defaultProps = {
     minimized: false,
+    detached: false,
     valid: null,
     onClick: vi.fn(),
     onRightClick: vi.fn(),
+    onToggleDetach: vi.fn(),
   };
 
   beforeEach(() => {
@@ -33,9 +38,7 @@ describe('FormDockHeader', () => {
     it('should have correct title when not minimized', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
-
-      expect(button).toHaveAttribute(
+      expect(getStrip()).toHaveAttribute(
         'title',
         'Click to collapse the form tools panel. Right mouse click maximizes the panel.'
       );
@@ -44,20 +47,28 @@ describe('FormDockHeader', () => {
     it('should have correct title when minimized', () => {
       render(<FormDockHeader {...defaultProps} minimized={true} />);
 
-      const button = screen.getByRole('button');
-
-      expect(button).toHaveAttribute(
+      expect(getStrip()).toHaveAttribute(
         'title',
         'Click to expand the form tools panel. Right mouse click maximizes the panel.'
       );
     });
 
-    it('should render as a button with tabIndex 0', () => {
+    it('should render the collapse/expand strip with tabIndex 0', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
+      expect(getStrip()).toHaveAttribute('tabIndex', '0');
+    });
 
-      expect(button).toHaveAttribute('tabIndex', '0');
+    it('should render detached label when detached', () => {
+      render(<FormDockHeader {...defaultProps} detached={true} />);
+
+      expect(screen.getByText(/form tools detached/i)).toBeInTheDocument();
+    });
+
+    it('should set the attach title on the strip when detached', () => {
+      render(<FormDockHeader {...defaultProps} detached={true} />);
+
+      expect(getStrip()).toHaveAttribute('title', 'Click to re-attach the form tools panel.');
     });
   });
 
@@ -124,8 +135,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      await user.click(button);
+      await user.click(getStrip());
 
       expect(onClick).toHaveBeenCalledTimes(1);
       expect(onClick).toHaveBeenCalledWith(
@@ -143,9 +153,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-
-      await user.pointer({ keys: '[MouseRight]', target: button });
+      await user.pointer({ keys: '[MouseRight]', target: getStrip() });
 
       expect(onRightClick).toHaveBeenCalledTimes(1);
       expect(onRightClick).toHaveBeenCalledWith(
@@ -161,8 +169,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      await user.click(button);
+      await user.click(getStrip());
 
       expect(onRightClick).not.toHaveBeenCalled();
     });
@@ -175,8 +182,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard(' ');
 
@@ -194,8 +200,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard('{Enter}');
 
@@ -213,8 +218,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard('{Alt>} {/Alt}');
 
@@ -227,8 +231,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
       await user.keyboard('{Control>} {/Control}');
 
       expect(onClick).not.toHaveBeenCalled();
@@ -240,8 +243,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard('{Shift>} {/Shift}');
 
@@ -254,8 +256,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
       await user.keyboard('{Alt>}{Enter}{/Alt}');
 
       expect(onRightClick).not.toHaveBeenCalled();
@@ -267,8 +268,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
       await user.keyboard('{Control>}{Enter}{/Control}');
 
       expect(onRightClick).not.toHaveBeenCalled();
@@ -280,8 +280,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard('{Shift>}{Enter}{/Shift}');
 
@@ -295,8 +294,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard('a');
       await user.keyboard('{Escape}');
@@ -312,12 +310,14 @@ describe('FormDockHeader', () => {
       const user = userEvent.setup();
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
-      expect(button).toHaveStyle({ outline: 'none' });
+      const strip = getStrip();
+      expect(strip).toHaveStyle({ outline: 'none' });
 
+      // detach button is the first focusable, strip is second
+      await user.tab();
       await user.tab();
 
-      expect(button).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
+      expect(strip).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
     });
 
     it('should remove outline on blur', async () => {
@@ -329,24 +329,26 @@ describe('FormDockHeader', () => {
         </>
       );
 
-      const button = screen.getByRole('button', { name: /form tools/i });
+      const strip = getStrip();
+
+      // detach button is first, strip is second
+      await user.tab();
+      await user.tab();
+      expect(strip).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
 
       await user.tab();
-      expect(button).toHaveStyle({ outline: `solid 1px ${colors.PANEL_HEADER_OUTLINE_COLOR}` });
-
-      await user.tab();
-      expect(button).toHaveStyle({ outline: 'none' });
+      expect(strip).toHaveStyle({ outline: 'none' });
     });
 
     it('should be focusable via tab navigation', async () => {
       const user = userEvent.setup();
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
-
+      // detach button is first, strip is second
+      await user.tab();
       await user.tab();
 
-      expect(button).toHaveFocus();
+      expect(getStrip()).toHaveFocus();
     });
   });
 
@@ -354,38 +356,78 @@ describe('FormDockHeader', () => {
     it('should have role="button"', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      expect(screen.getByRole('button')).toBeInTheDocument();
+      expect(getStrip()).toBeInTheDocument();
     });
 
     it('should be keyboard navigable with tabIndex', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
-
-      expect(button).toHaveAttribute('tabIndex', '0');
+      expect(getStrip()).toHaveAttribute('tabIndex', '0');
     });
 
     it('should have descriptive title attribute', () => {
       render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
+      const strip = getStrip();
 
-      expect(button).toHaveAttribute('title');
-      expect(button.getAttribute('title')).toMatch(/Click to (expand|collapse)/);
+      expect(strip).toHaveAttribute('title');
+      expect(strip.getAttribute('title')).toMatch(/Click to (expand|collapse)/);
     });
 
-    it('should have user-select: none to prevent text selection', () => {
-      render(<FormDockHeader {...defaultProps} />);
+    it('should have user-select: none on the header strip', () => {
+      const { container } = render(<FormDockHeader {...defaultProps} />);
 
-      const button = screen.getByRole('button');
-
-      expect(button).toHaveStyle({ userSelect: 'none' });
+      const outerStrip = container.firstElementChild as HTMLElement;
+      expect(outerStrip).toHaveStyle({ userSelect: 'none' });
     });
 
     it('should have cursor: pointer to indicate interactivity', () => {
       render(<FormDockHeader {...defaultProps} />);
-      const button = screen.getByRole('button');
-      expect(button).toHaveStyle({ cursor: 'pointer' });
+
+      expect(getStrip()).toHaveStyle({ cursor: 'pointer' });
+    });
+  });
+
+  describe('Detach button', () => {
+    it('should render the detach button with the detach label when attached', () => {
+      render(<FormDockHeader {...defaultProps} detached={false} />);
+
+      expect(getDetachButton()).toHaveAttribute(
+        'aria-label',
+        'Detach panel into a separate window'
+      );
+    });
+
+    it('should render the detach button with the attach label when detached', () => {
+      render(<FormDockHeader {...defaultProps} detached={true} />);
+
+      expect(getDetachButton()).toHaveAttribute('aria-label', 'Attach panel');
+    });
+
+    it('should call onToggleDetach when the detach button is clicked', async () => {
+      const user = userEvent.setup();
+      const onToggleDetach = vi.fn();
+
+      render(<FormDockHeader {...defaultProps} onToggleDetach={onToggleDetach} />);
+
+      await user.click(getDetachButton());
+
+      expect(onToggleDetach).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call onClick when the detach button is clicked', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const onToggleDetach = vi.fn();
+
+      render(
+        <FormDockHeader {...defaultProps} onClick={onClick} onToggleDetach={onToggleDetach} />
+      );
+
+      await user.click(getDetachButton());
+
+      expect(onClick).not.toHaveBeenCalled();
+      expect(onToggleDetach).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -396,8 +438,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      await user.tripleClick(button);
+      await user.tripleClick(getStrip());
 
       expect(onClick).toHaveBeenCalledTimes(3);
     });
@@ -430,8 +471,10 @@ describe('FormDockHeader', () => {
 
       rerender(<FormDockHeader {...defaultProps} valid={true} />);
 
-      const allSvgs = document.querySelectorAll('svg');
-      expect(allSvgs[0]).toHaveStyle({ visibility: 'hidden' });
+      const validitySvg = screen
+        .getByTitle(/the form has not been validated|the form has errors/i)
+        .closest('svg');
+      expect(validitySvg).toHaveStyle({ visibility: 'hidden' });
     });
 
     it('should work with different callback functions', async () => {
@@ -440,16 +483,15 @@ describe('FormDockHeader', () => {
       const secondOnClick = vi.fn();
 
       const { rerender } = render(<FormDockHeader {...defaultProps} onClick={firstOnClick} />);
-      const button = screen.getByRole('button');
 
-      await user.click(button);
+      await user.click(getStrip());
 
       expect(firstOnClick).toHaveBeenCalledTimes(1);
       expect(secondOnClick).not.toHaveBeenCalled();
 
       rerender(<FormDockHeader {...defaultProps} onClick={secondOnClick} />);
 
-      await user.click(button);
+      await user.click(getStrip());
 
       expect(firstOnClick).toHaveBeenCalledTimes(1);
       expect(secondOnClick).toHaveBeenCalledTimes(1);
@@ -465,10 +507,10 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={handler} onRightClick={handler} />);
 
-      const button = screen.getByRole('button');
+      const strip = getStrip();
 
-      await user.click(button);
-      await user.pointer({ keys: '[MouseRight]', target: button });
+      await user.click(strip);
+      await user.pointer({ keys: '[MouseRight]', target: strip });
 
       expect(handler).toHaveBeenCalledTimes(2);
     });
@@ -484,8 +526,7 @@ describe('FormDockHeader', () => {
         </a>
       );
 
-      const button = screen.getByRole('button');
-      await user.click(button);
+      await user.click(getStrip());
 
       expect(childClick).toHaveBeenCalledTimes(1);
       expect(parentClick).toHaveBeenCalledTimes(1);
@@ -498,8 +539,7 @@ describe('FormDockHeader', () => {
 
       render(<FormDockHeader {...defaultProps} onClick={onClick} onRightClick={onRightClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      getStrip().focus();
 
       await user.keyboard(' ');
       await user.keyboard('{Enter}');

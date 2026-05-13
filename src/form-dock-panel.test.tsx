@@ -6,6 +6,12 @@ import { useFormState, z } from 'form-state';
 import FormDockPanel, { type FormDockPanelProps } from './form-dock-panel';
 import userEvent from '@testing-library/user-event';
 
+vi.mock('./popup-portal', () => ({
+  default: ({ children }: { children: React.ReactNode; onClose: () => void }) => (
+    <div data-testid="popup-portal">{children}</div>
+  ),
+}));
+
 const formSchema = z
   .object({
     id: z.formNumber({ required: true }).with(z.describe('ID')),
@@ -31,6 +37,9 @@ const AppDockPanelWithErrors = (props: Omit<FormDockPanelProps, 'form'>) => {
 
   return <FormDockPanel {...props} form={form} />;
 };
+
+const getDetachButton = () =>
+  screen.getByRole('button', { name: /^(detach|attach) panel/i, hidden: true });
 
 describe('FormDock', () => {
   describe('Rendering', () => {
@@ -94,7 +103,7 @@ describe('FormDock', () => {
       const panelNode = screen.getByRole('complementary', { hidden: true });
       const headerNode = screen.getByText('EXPAND FORM TOOLS');
 
-      expect(panelNode.style.height).toBe('1.125rem');
+      expect(panelNode.style.height).toBe('1.625rem');
 
       await user.click(headerNode);
 
@@ -114,7 +123,7 @@ describe('FormDock', () => {
 
       await user.click(headerNode);
 
-      expect(panelNode.style.height).toBe('1.125rem');
+      expect(panelNode.style.height).toBe('1.625rem');
       expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
     });
 
@@ -164,6 +173,7 @@ describe('FormDock', () => {
   describe('Session storage', () => {
     afterEach(() => {
       sessionStorage.removeItem('__form-dock-size');
+      sessionStorage.removeItem('__form-dock-detached');
     });
 
     it('restores a valid stored size, overriding the collapsed prop', () => {
@@ -203,7 +213,119 @@ describe('FormDock', () => {
 
       const panelNode = screen.getByRole('complementary', { hidden: true });
 
-      expect(panelNode.style.height).toBe('1.125rem');
+      expect(panelNode.style.height).toBe('1.625rem');
+    });
+
+    it('restores detached state from sessionStorage', () => {
+      sessionStorage.setItem('__form-dock-detached', 'true');
+
+      render(<AppDockPanel {...defaultProps} />);
+
+      expect(screen.getByTestId('popup-portal')).toBeInTheDocument();
+      expect(screen.queryByRole('complementary', { hidden: true })).not.toBeInTheDocument();
+    });
+
+    it('defaults to attached when no detached value is stored', () => {
+      render(<AppDockPanel {...defaultProps} />);
+
+      expect(screen.queryByTestId('popup-portal')).not.toBeInTheDocument();
+      expect(screen.getByRole('complementary', { hidden: true })).toBeInTheDocument();
+    });
+
+    it('defaults to attached when sessionStorage is unavailable', () => {
+      vi.stubGlobal('sessionStorage', undefined);
+
+      render(<AppDockPanel {...defaultProps} />);
+
+      expect(screen.queryByTestId('popup-portal')).not.toBeInTheDocument();
+      expect(screen.getByRole('complementary', { hidden: true })).toBeInTheDocument();
+
+      vi.unstubAllGlobals();
+    });
+  });
+
+  describe('Detach', () => {
+    afterEach(() => {
+      sessionStorage.removeItem('__form-dock-size');
+      sessionStorage.removeItem('__form-dock-detached');
+    });
+
+    it('renders the popup portal after clicking the detach button', async () => {
+      const user = userEvent.setup();
+
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
+
+      expect(screen.queryByTestId('popup-portal')).not.toBeInTheDocument();
+
+      await user.click(getDetachButton());
+
+      expect(screen.getByTestId('popup-portal')).toBeInTheDocument();
+      expect(screen.queryByRole('complementary', { hidden: true })).not.toBeInTheDocument();
+    });
+
+    it('persists the detached state to sessionStorage on detach', async () => {
+      const user = userEvent.setup();
+
+      render(<AppDockPanel {...defaultProps} />);
+
+      await user.click(getDetachButton());
+
+      expect(sessionStorage.getItem('__form-dock-detached')).toBe('true');
+    });
+
+    it('re-attaches after clicking the attach button in the popup', async () => {
+      const user = userEvent.setup();
+      sessionStorage.setItem('__form-dock-detached', 'true');
+
+      render(<AppDockPanel {...defaultProps} />);
+
+      expect(screen.getByTestId('popup-portal')).toBeInTheDocument();
+
+      await user.click(getDetachButton());
+
+      expect(screen.queryByTestId('popup-portal')).not.toBeInTheDocument();
+      expect(screen.getByRole('complementary', { hidden: true })).toBeInTheDocument();
+      expect(sessionStorage.getItem('__form-dock-detached')).toBe('false');
+    });
+
+    it('re-attaches when the strip is clicked in the popup', async () => {
+      const user = userEvent.setup();
+      sessionStorage.setItem('__form-dock-detached', 'true');
+
+      render(<AppDockPanel {...defaultProps} />);
+
+      const stripInPopup = screen.getByText(/form tools detached/i);
+
+      await user.click(stripInPopup);
+
+      expect(screen.queryByTestId('popup-portal')).not.toBeInTheDocument();
+      expect(screen.getByRole('complementary', { hidden: true })).toBeInTheDocument();
+    });
+
+    it('removes the body margin while detached', async () => {
+      const user = userEvent.setup();
+
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
+
+      expect(document.body.style.marginBottom).toBe('33vh');
+
+      await user.click(getDetachButton());
+
+      expect(document.body.style.marginBottom).toBe('0px');
+    });
+
+    it('does not call onClick on the detach button click handler', async () => {
+      const user = userEvent.setup();
+
+      render(<AppDockPanel {...defaultProps} collapsed={false} />);
+
+      const panelNode = screen.getByRole('complementary', { hidden: true });
+
+      expect(panelNode.style.height).toBe('30vh');
+
+      await user.click(getDetachButton());
+
+      expect(screen.getByTestId('popup-portal')).toBeInTheDocument();
     });
   });
 });

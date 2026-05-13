@@ -6,6 +6,7 @@ import type { FormStateResponse } from 'form-state';
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 import FormDockHeader from './form-dock-header';
 import ErrorToast from './error-toast';
+import PopupPortal from './popup-portal';
 import * as colors from './colors';
 
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
@@ -18,18 +19,19 @@ export type FormDockPanelProps = Readonly<{
 }>;
 
 const FORM_SIZE_KEY = '__form-dock-size';
+const FORM_DETACHED_KEY = '__form-dock-detached';
 const VALID_SIZES = new Set<FormDockSize>(['minimized', 'normal', 'maximized']);
 
 const hasSessionStorage = () => typeof globalThis.sessionStorage === 'object';
 
 const SIZE_TO_HEIGHT: Record<FormDockSize, string> = {
-  minimized: '1.125rem',
+  minimized: '1.625rem',
   normal: '30vh',
   maximized: '100vh',
 };
 
 const SIZE_TO_BODY_MARGIN: Record<FormDockSize, string> = {
-  minimized: '2.5rem',
+  minimized: '3rem',
   normal: '33vh',
   maximized: '0',
 };
@@ -68,9 +70,22 @@ const getInitialSize = (collapsed: boolean): FormDockSize => {
   return collapsed ? 'minimized' : 'normal';
 };
 
+const getInitialDetached = (): boolean => {
+  if (!hasSessionStorage()) {
+    return false;
+  }
+  return sessionStorage.getItem(FORM_DETACHED_KEY) === 'true';
+};
+
 const setStoredSize = (size: FormDockSize) => {
   if (hasSessionStorage()) {
     sessionStorage.setItem(FORM_SIZE_KEY, size);
+  }
+};
+
+const setStoredDetached = (detached: boolean) => {
+  if (hasSessionStorage()) {
+    sessionStorage.setItem(FORM_DETACHED_KEY, String(detached));
   }
 };
 
@@ -117,6 +132,19 @@ const renderItemString = (
   <span style={{ color: colors.JSON_TREE_ITEM_COLOR, fontSize: '0.85rem' }}>[{itemString}]</span>
 );
 
+const renderTree = (data: object) => (
+  <JSONTree
+    data={data}
+    keyPath={['form']}
+    theme={{
+      base0D: colors.JSON_TREE_BASE_COLOR,
+    }}
+    labelRenderer={renderLabel}
+    valueRenderer={renderValue}
+    getItemString={renderItemString}
+  />
+);
+
 function FormDockPanel({
   form,
   collapsed,
@@ -124,6 +152,7 @@ function FormDockPanel({
   ignoreErrorPatterns,
 }: FormDockPanelProps) {
   const [size, setSize] = useState<FormDockSize>(() => getInitialSize(collapsed));
+  const [detached, setDetached] = useState<boolean>(() => getInitialDetached());
 
   const formObject = useMemo(() => {
     return sortObject(
@@ -137,18 +166,42 @@ function FormDockPanel({
     );
   }, [form]);
 
+  const bodyMargin = detached ? '0' : SIZE_TO_BODY_MARGIN[size];
+
   useEffect(() => {
     const prevMargin = document.body.style.marginBottom;
     const prevOverflow = document.body.style.overflowY;
 
     document.body.style.overflowY = 'auto';
-    document.body.style.marginBottom = SIZE_TO_BODY_MARGIN[size];
+    document.body.style.marginBottom = bodyMargin;
 
     return () => {
       document.body.style.marginBottom = prevMargin;
       document.body.style.overflowY = prevOverflow;
     };
-  }, [size]);
+  }, [bodyMargin]);
+
+  const attach = useCallback(() => {
+    setDetached(false);
+    setStoredDetached(false);
+  }, []);
+
+  const detach = useCallback(() => {
+    setDetached(true);
+    setStoredDetached(true);
+  }, []);
+
+  const handleToggleDetach = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      if (detached) {
+        attach();
+      } else {
+        detach();
+      }
+    },
+    [detached, attach, detach]
+  );
 
   const handleClick = useCallback((event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -174,45 +227,63 @@ function FormDockPanel({
 
   return (
     <>
-      <aside
-        ref={initializeRef}
-        popover="manual"
-        style={{
-          position: 'fixed',
-          backgroundColor: colors.PANEL_BACKGROUND_COLOR,
-          minWidth: '100%',
-          width: '100%',
-          height: SIZE_TO_HEIGHT[size],
-          paddingLeft: '0.75rem',
-          paddingRight: '0.75rem',
-          overflow: 'auto',
-          left: 0,
-          top: 'auto',
-          bottom: 0,
-          fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-          fontSize: '14px',
-          lineHeight: 1.8,
-        }}
-      >
-        <FormDockHeader
-          minimized={size === 'minimized'}
-          valid={form.formStatus.valid}
-          onClick={handleClick}
-          onRightClick={handleRightClick}
-        />
-        {size !== 'minimized' && (
-          <JSONTree
-            data={formObject}
-            keyPath={['form']}
-            theme={{
-              base0D: colors.JSON_TREE_BASE_COLOR,
-            }}
-            labelRenderer={renderLabel}
-            valueRenderer={renderValue}
-            getItemString={renderItemString}
+      {!detached && (
+        <aside
+          ref={initializeRef}
+          popover="manual"
+          style={{
+            position: 'fixed',
+            backgroundColor: colors.PANEL_BACKGROUND_COLOR,
+            minWidth: '100%',
+            width: '100%',
+            height: SIZE_TO_HEIGHT[size],
+            padding: '0 0.75rem',
+            border: 'none',
+            overflow: 'auto',
+            left: 0,
+            top: 'auto',
+            bottom: 0,
+            fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+            fontSize: '14px',
+            lineHeight: 1.8,
+          }}
+        >
+          <FormDockHeader
+            minimized={size === 'minimized'}
+            detached={false}
+            valid={form.formStatus.valid}
+            onClick={handleClick}
+            onRightClick={handleRightClick}
+            onToggleDetach={handleToggleDetach}
           />
-        )}
-      </aside>
+          {size !== 'minimized' && renderTree(formObject)}
+        </aside>
+      )}
+      {detached && (
+        <PopupPortal onClose={attach}>
+          <div
+            style={{
+              backgroundColor: colors.PANEL_BACKGROUND_COLOR,
+              minHeight: '100%',
+              padding: '0 0.75rem 0.3125rem',
+              fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+              fontSize: '14px',
+              lineHeight: 1.8,
+              boxSizing: 'border-box',
+            }}
+          >
+            <FormDockHeader
+              minimized={false}
+              detached
+              valid={form.formStatus.valid}
+              onClick={handleToggleDetach}
+              onRightClick={handleToggleDetach}
+              onToggleDetach={handleToggleDetach}
+            />
+            {renderTree(formObject)}
+          </div>
+        </PopupPortal>
+      )}
       {captureErrors !== 'none' && (
         <ErrorToast captureErrors={captureErrors} ignoreErrorPatterns={ignoreErrorPatterns} />
       )}
