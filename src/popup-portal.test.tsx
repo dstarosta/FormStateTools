@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import { act, cleanup, render } from '@testing-library/react';
 
@@ -186,6 +187,35 @@ describe('PopupPortal', () => {
 
     expect(openSpy).toHaveBeenCalledTimes(1);
     expect(popupWindow.close).not.toHaveBeenCalled();
+  });
+
+  it('opens only one popup under StrictMode (mount/cleanup/mount cycle)', () => {
+    expect(process.env['NODE_ENV']).toBe('development');
+
+    const { unmount } = render(
+      <StrictMode>
+        <PopupPortal onClose={vi.fn()}>x</PopupPortal>
+      </StrictMode>
+    );
+
+    expect(openSpy).toHaveBeenCalledTimes(1);
+    expect(popupWindow.close).not.toHaveBeenCalled();
+    expect(popupWindow.closed).toBe(false);
+
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    expect(popupWindow.close).not.toHaveBeenCalled();
+    expect(popupWindow.closed).toBe(false);
+
+    act(() => {
+      unmount();
+      vi.runAllTimers();
+    });
+
+    expect(popupWindow.close).toHaveBeenCalledTimes(1);
+    expect(popupWindow.closed).toBe(true);
   });
 
   it('opens a new popup when the previous shared window was closed', () => {

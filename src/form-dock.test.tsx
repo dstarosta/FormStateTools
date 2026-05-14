@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 
 import { useFormState, z } from 'form-state';
 
@@ -54,5 +55,13 @@ describe('FormDock', () => {
     render(<AppForm devMode={false} />);
 
     expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing during SSR even in dev mode (isMounted gate)', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+
+    const html = renderToString(<AppForm devMode />);
+
+    expect(html).not.toContain('EXPAND FORM TOOLS');
   });
 });

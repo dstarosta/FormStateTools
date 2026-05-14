@@ -16,9 +16,9 @@ export const DetachIcon = () => (
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" />
+    <path d="m21 3-9 9" />
     <path d="M15 3h6v6" />
-    <path d="M10 14L21 3" />
   </svg>
 );
 
@@ -35,11 +35,9 @@ export const AttachIcon = () => (
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    <path d="M3 11V5a2 2 0 0 1 2-2h6" />
-    <path d="M9 3H3v6" />
-    <path d="M3 3l9 9" />
-    <path d="M14 21h5a2 2 0 0 0 2-2v-5" />
-    <path d="M14 14h7v7" />
+    <path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <line x1="3" y1="12" x2="15" y2="12" />
+    <polyline points="10 17 15 12 10 7" />
   </svg>
 );
 
