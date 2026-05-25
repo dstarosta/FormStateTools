@@ -13,8 +13,7 @@ export default defineConfig({
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     }),
   ],
-  entry: 'src/index.ts',
-  clean: true,
+  clean: false,
   deps: {
     onlyBundle: [
       'react-json-tree',
@@ -30,7 +29,14 @@ export default defineConfig({
   dts: {
     enabled: false,
   },
-  minify: true,
+  entry: 'src/index.ts',
+  minify: {
+    compress: true,
+    mangle: true,
+  },
+  platform: 'browser',
+  publint: true,
   sourcemap: 'hidden',
+  target: 'es2022',
   treeshake: true,
 });
