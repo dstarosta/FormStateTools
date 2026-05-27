@@ -32,11 +32,16 @@ export default defineConfig({
   entry: {
     'form-state-tools': 'src/index.ts',
   },
+  inputOptions: {
+    resolve: {
+      mainFields: ['module', 'browser', 'main'],
+    },
+  },
   minify: {
     compress: true,
     mangle: true,
   },
-  platform: 'browser',
+  platform: 'neutral',
   publint: true,
   sourcemap: 'hidden',
   target: 'es2022',
