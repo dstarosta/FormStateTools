@@ -29,7 +29,9 @@ export default defineConfig({
   dts: {
     enabled: false,
   },
-  entry: 'src/index.ts',
+  entry: {
+    'form-state-tools': 'src/index.ts',
+  },
   minify: {
     compress: true,
     mangle: true,
