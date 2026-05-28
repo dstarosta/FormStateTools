@@ -11,8 +11,8 @@ type FormStateToolsOptions = {
    * A substring matched against module ids to locate your app's client-entry
    * module (the JS/TS file that runs in the browser, e.g. `entry-client.tsx`).
    * The dock mount is appended there. Only needed for SSR setups whose client
-   * entry is not auto-detected — not for SPAs (which use `index.html`) or
-   * TanStack Start (auto-detected).
+   * entry is not auto-detected — not for SPAs (which use `index.html`),
+   * TanStack Start, or React Router (Remix) (all auto-detected).
    *
    * This must name a JavaScript module, not an HTML file. Setting it takes full
    * control of injection: the `index.html` script path is disabled, so the dock

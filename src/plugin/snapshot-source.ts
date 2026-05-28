@@ -31,6 +31,9 @@ export const subscribeToSnapshots = (listener: Listener): (() => void) => {
   };
 };
 
+/**
+ * Client snapshot for `useSyncExternalStore`.
+ */
 export const getSnapshot = (): FormDockSnapshot | undefined => current;
 
 /**
@@ -47,9 +50,8 @@ const ensureTransport = () => {
   }
   transportWired = true;
 
-  // Vite injects `import.meta.hot` only in dev. In a production build this branch
-  // is dead and tree-shakes out.
   const hot = getHot();
+
   if (hot) {
     hot.on(FORM_DOCK_EVENT, (snapshot) => {
       setSnapshot(snapshot);
@@ -69,6 +71,7 @@ export const reportFormState = (snapshot: FormDockSnapshot): void => {
   setSnapshot(snapshot);
 
   const hot = getHot();
+
   if (hot) {
     hot.send(FORM_DOCK_EVENT, snapshot);
   }

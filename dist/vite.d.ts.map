@@ -1,1 +1,1 @@
-{"version":3,"file":"vite.d.ts","names":[],"sources":["../src/plugin/vite.ts"],"mappings":";;;KAOY,qBAAA;;AAAZ;;;EAKE,OAAA;EAYW;AACX;;;;;;;;AA4BkE;;EA7BlE,WAAW;AAAA;;;;;;;;;;;;;;;;iBA6BJ,cAAA,CAAe,OAAA,GAAS,qBAAA,GAA6B,MAAM"}
+{"version":3,"file":"vite.d.ts","names":[],"sources":["../src/plugin/vite.ts"],"mappings":";;;KAOY,qBAAA;;AAAZ;;;EAKE,OAAA;EAYW;AACX;;;;;;;;AAyBkE;;EA1BlE,WAAW;AAAA;;;;;;;;;;;;;;;;iBA0BJ,cAAA,CAAe,OAAA,GAAS,qBAAA,GAA6B,MAAM"}

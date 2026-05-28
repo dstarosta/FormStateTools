@@ -19,19 +19,35 @@ const { mountFormDock } = await import('./runtime');
 
 const CONTAINER_SELECTOR = '#__form-state-tools-root';
 
+const setReadyState = (value: DocumentReadyState) => {
+  Object.defineProperty(document, 'readyState', {
+    value,
+    configurable: true,
+  });
+};
+
 describe('mountFormDock', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     createRoot.mockClear();
     render.mockClear();
+    setReadyState('complete');
+    // The mount is deferred by a short timeout past hydration; use fake timers so
+    // tests can flush it deterministically.
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
-  it('appends a container to the body and renders into it', () => {
+  it('appends a container to the body and renders into it (page already loaded)', () => {
     mountFormDock();
+    // Deferred — not mounted until the timeout elapses.
+    expect(createRoot).not.toHaveBeenCalled();
+
+    vi.runAllTimers();
 
     const container = document.querySelector(CONTAINER_SELECTOR);
     expect(container).toBeTruthy();
@@ -40,9 +56,22 @@ describe('mountFormDock', () => {
     expect(render).toHaveBeenCalledTimes(1);
   });
 
+  it('waits for the load event when the page is still loading', () => {
+    setReadyState('loading');
+
+    mountFormDock();
+    globalThis.dispatchEvent(new Event('load'));
+    // Still deferred until the timeout after load.
+    expect(createRoot).not.toHaveBeenCalled();
+
+    vi.runAllTimers();
+    expect(createRoot).toHaveBeenCalledTimes(1);
+  });
+
   it('is idempotent: a second call does not create a second container or root', () => {
     mountFormDock();
     mountFormDock();
+    vi.runAllTimers();
 
     expect(document.querySelectorAll(CONTAINER_SELECTOR)).toHaveLength(1);
     expect(createRoot).toHaveBeenCalledTimes(1);

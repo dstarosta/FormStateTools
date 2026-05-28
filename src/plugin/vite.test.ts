@@ -7,6 +7,9 @@ import { FORM_DOCK_EVENT } from './transport';
 const VIRTUAL_ID = 'virtual:form-state-tools/mount';
 const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID;
 
+// What the transform hook appends to a matched client entry.
+const INJECTED_IMPORT = `import '${VIRTUAL_ID}';`;
+
 const getPlugin = (options?: FormStateToolsOptions): Plugin => formStateTools(options);
 
 // The hooks are declared as plain functions on our plugin object, so we can call
@@ -35,8 +38,47 @@ const htmlTags = (plugin: Plugin): { order: string | undefined; tags: HtmlTag[] 
   return { order: hook.order, tags: hook.handler() as HtmlTag[] };
 };
 
+const resolveConfig = (
+  plugin: Plugin,
+  config: { base?: string; plugins?: Array<{ name: string }> } = {}
+): void => {
+  asFn(plugin.configResolved)({
+    base: config.base ?? '/',
+    plugins: config.plugins ?? [],
+  } as never);
+};
+
 const withBase = (plugin: Plugin, base: string): void => {
-  asFn(plugin.configResolved)({ base } as never);
+  resolveConfig(plugin, { base });
+};
+
+const withReactRouter = (plugin: Plugin): void => {
+  resolveConfig(plugin, { plugins: [{ name: 'vite:react-router' }] });
+};
+
+const transformWithRR = (id: string, code = 'export {};'): { code: string } | undefined => {
+  const plugin = getPlugin();
+  withReactRouter(plugin);
+  const transform = asFn(plugin.transform);
+  return transform(code as never, id as never) as { code: string } | undefined;
+};
+
+const setupRelay = () => {
+  const handlers: Record<string, (data: unknown, client: unknown) => void> = {};
+  const sender = { send: vi.fn() };
+  const other = { send: vi.fn() };
+  const server = {
+    ws: {
+      on: (event: string, cb: (data: unknown, client: unknown) => void) => {
+        handlers[event] = cb;
+      },
+      clients: new Set([sender, other]),
+    },
+  };
+
+  asFn(getPlugin().configureServer)(server as never);
+
+  return { handlers, sender, other };
 };
 
 describe('formStateTools vite plugin', () => {
@@ -99,14 +141,13 @@ describe('formStateTools vite plugin', () => {
     it('injects the mount into the TanStack Start dev client entry', () => {
       const result = runTransform('\0virtual:tanstack-start-dev-client-entry');
 
-      expect(result?.code).toContain('__fstMount()');
-      expect(result?.code).toContain("from 'form-state-tools/runtime'");
+      expect(result?.code).toContain(INJECTED_IMPORT);
     });
 
     it('injects into the TanStack Start production client entry', () => {
       const result = runTransform('\0virtual:tanstack-start-client-entry');
 
-      expect(result?.code).toContain('__fstMount()');
+      expect(result?.code).toContain(INJECTED_IMPORT);
     });
 
     it('preserves the original module code', () => {
@@ -123,8 +164,19 @@ describe('formStateTools vite plugin', () => {
       expect(runTransform('/node_modules/virtual:tanstack-start-client-entry')).toBeUndefined();
     });
 
+    it('skips the SSR pass (only injects into the client build)', () => {
+      const transform = asFn(getPlugin().transform);
+      const result = transform(
+        'export {};' as never,
+        '\0virtual:tanstack-start-client-entry' as never,
+        { ssr: true } as never
+      );
+
+      expect(result).toBeUndefined();
+    });
+
     it('does not double-inject when the mount is already present', () => {
-      const already = "import { mountFormDock as __fstMount } from 'form-state-tools/runtime';";
+      const already = INJECTED_IMPORT;
 
       expect(runTransform('\0virtual:tanstack-start-client-entry', already)).toBeUndefined();
     });
@@ -134,7 +186,7 @@ describe('formStateTools vite plugin', () => {
         clientEntry: 'entry-client',
       });
 
-      expect(result?.code).toContain('__fstMount()');
+      expect(result?.code).toContain(INJECTED_IMPORT);
     });
 
     it('does not match the default entries when clientEntry is set', () => {
@@ -148,7 +200,39 @@ describe('formStateTools vite plugin', () => {
     it('ignores query suffixes on ids when matching', () => {
       const result = runTransform('\0virtual:tanstack-start-client-entry?v=123');
 
-      expect(result?.code).toContain('__fstMount()');
+      expect(result?.code).toContain(INJECTED_IMPORT);
+    });
+  });
+
+  describe('transform (React Router auto-detection)', () => {
+    it('injects into the app root module when React Router is detected', () => {
+      expect(transformWithRR('/app/root.tsx')?.code).toContain(INJECTED_IMPORT);
+    });
+
+    it('matches root.jsx as well', () => {
+      expect(transformWithRR('/app/root.jsx')?.code).toContain(INJECTED_IMPORT);
+    });
+
+    it('does not match modules that merely contain "root"', () => {
+      expect(transformWithRR('/app/RootProvider.tsx')).toBeUndefined();
+      expect(transformWithRR('/app/app-root.tsx')).toBeUndefined();
+      expect(transformWithRR('/src/root-layout.tsx')).toBeUndefined();
+    });
+
+    it('does not match a node_modules root module', () => {
+      expect(transformWithRR('/node_modules/@react-router/dev/dist/root.tsx')).toBeUndefined();
+    });
+
+    it('does not target root without React Router detected', () => {
+      // Default plugin, no configResolved with the RR plugin present.
+      expect(runTransform('/app/root.tsx')).toBeUndefined();
+    });
+
+    it('skips the index.html path when React Router is detected', () => {
+      const plugin = getPlugin();
+      withReactRouter(plugin);
+
+      expect(htmlTags(plugin).tags).toHaveLength(0);
     });
   });
 
@@ -182,25 +266,22 @@ describe('formStateTools vite plugin', () => {
   });
 
   describe('configureServer (ws relay)', () => {
-    it('relays the snapshot event to all clients', () => {
-      const handlers: Record<string, (data: unknown) => void> = {};
-      const send = vi.fn();
-      const server = {
-        ws: {
-          on: (event: string, cb: (data: unknown) => void) => {
-            handlers[event] = cb;
-          },
-          send,
-        },
-      };
-
-      const configureServer = asFn(getPlugin().configureServer);
-      configureServer(server as never);
-
+    it('relays the snapshot to other connected clients', () => {
+      const { handlers, other } = setupRelay();
       const payload = { initialState: {}, formState: {}, formStatus: { valid: true } };
-      handlers[FORM_DOCK_EVENT]?.(payload);
 
-      expect(send).toHaveBeenCalledWith(FORM_DOCK_EVENT, payload);
+      handlers[FORM_DOCK_EVENT]?.(payload, { send: vi.fn() });
+
+      expect(other.send).toHaveBeenCalledWith(FORM_DOCK_EVENT, payload);
+    });
+
+    it('does not echo the snapshot back to the sender', () => {
+      const { handlers, sender } = setupRelay();
+      const payload = { initialState: {}, formState: {}, formStatus: { valid: true } };
+
+      handlers[FORM_DOCK_EVENT]?.(payload, sender);
+
+      expect(sender.send).not.toHaveBeenCalled();
     });
   });
 });
