@@ -1,6 +1,5 @@
+import { n as reportFormState, r as FormDockSnapshot, t as useFormDock } from "./use-form-dock-ChNVBHPN.js";
 import * as _$react_jsx_runtime0 from "react/jsx-runtime";
-import * as z from "zod/mini";
-import { FormStateResponse } from "form-state";
 
 //#region src/form-dock.d.ts
 /**
@@ -23,9 +22,13 @@ type ErrorPattern = string | RegExp;
  */
 type FormDockProps = Readonly<{
   /**
-   * The form state instance.
+   * The form state snapshot to display.
+   *
+   * Omit this when the dock is injected by the `form-state-tools` Vite plugin: the
+   * dock then subscribes to snapshots pushed over the dev transport via
+   * `reportFormState` instead of receiving them as a prop.
    */
-  form: FormStateResponse<z.ZodMiniObject>;
+  form?: FormDockSnapshot;
   /**
    * Is the application code running in "development" mode?
    *
@@ -87,5 +90,5 @@ declare function FormDock({
   ignoreErrorPatterns
 }: FormDockProps): _$react_jsx_runtime0.JSX.Element | null;
 //#endregion
-export { FormDock };
-//# sourceMappingURL=index.d.ts.map
+export { FormDock, type FormDockSnapshot, reportFormState, useFormDock };
+//# sourceMappingURL=form-state-tools.d.ts.map

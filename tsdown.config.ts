@@ -31,6 +31,8 @@ export default defineConfig({
   },
   entry: {
     'form-state-tools': 'src/index.ts',
+    client: 'src/plugin/client.ts',
+    runtime: 'src/plugin/runtime.tsx',
   },
   inputOptions: {
     resolve: {
@@ -42,7 +44,6 @@ export default defineConfig({
     mangle: true,
   },
   platform: 'neutral',
-  publint: true,
   sourcemap: 'hidden',
   target: 'es2022',
   treeshake: true,

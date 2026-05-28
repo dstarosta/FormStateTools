@@ -1,0 +1,1 @@
+const e=`form-state-tools:snapshot`,t=()=>import.meta.hot;let n;const r=new Set,i=()=>{for(let e of r)e()},a=e=>{n=e,i()},o=e=>(u(),r.add(e),()=>{r.delete(e)}),s=()=>n,c=()=>void 0;let l=!1;const u=()=>{if(l)return;l=!0;let n=t();n&&n.on(e,e=>{a(e)})},d=n=>{a(n);let r=t();r&&r.send(e,n)};export{o as i,s as n,d as r,c as t};

@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
-import type * as z from 'zod/mini';
-import { type FormStateResponse } from 'form-state';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import FormDockPanel from './form-dock-panel';
+import {
+  type FormDockSnapshot,
+  subscribeToSnapshots,
+  getSnapshot,
+  getServerSnapshot,
+} from './plugin/snapshot-source';
 
 /**
  * Defines what types of errors should be captured.
@@ -26,9 +30,13 @@ export type ErrorPattern = string | RegExp;
  */
 export type FormDockProps = Readonly<{
   /**
-   * The form state instance.
+   * The form state snapshot to display.
+   *
+   * Omit this when the dock is injected by the `form-state-tools` Vite plugin: the
+   * dock then subscribes to snapshots pushed over the dev transport via
+   * `reportFormState` instead of receiving them as a prop.
    */
-  form: FormStateResponse<z.ZodMiniObject>;
+  form?: FormDockSnapshot;
   /**
    * Is the application code running in "development" mode?
    *
@@ -94,6 +102,15 @@ function FormDock({
 }: FormDockProps) {
   const [isMounted, setIsMounted] = useState(false);
 
+  // Transport-driven mode: when no `form` prop is supplied, the latest snapshot
+  // comes from the dev transport. Subscribe unconditionally to satisfy the rules
+  // of hooks; the value is only used when `form` is absent.
+  const transportSnapshot = useSyncExternalStore(
+    subscribeToSnapshots,
+    getSnapshot,
+    getServerSnapshot
+  );
+
   useEffect(() => {
     // SSR workaround
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -104,13 +121,16 @@ function FormDock({
     return null;
   }
 
+  const snapshot = form ?? transportSnapshot;
+
   if (
-    devMode === true ||
-    (typeof process === 'object' && process.env['NODE_ENV']?.toLowerCase() === 'development')
+    snapshot &&
+    (devMode === true ||
+      (typeof process === 'object' && process.env['NODE_ENV']?.toLowerCase() === 'development'))
   ) {
     return (
       <FormDockPanel
-        form={form}
+        form={snapshot}
         collapsed={collapsed}
         captureErrors={captureErrors}
         ignoreErrorPatterns={ignoreErrorPatterns}

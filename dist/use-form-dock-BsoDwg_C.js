@@ -1,0 +1,1 @@
+import{r as e}from"./snapshot-source-D98XPzgh.js";import{c as t}from"react/compiler-runtime";import{useEffect as n}from"react";const r=r=>{let i=t(5),{initialState:a,formState:o,formStatus:s}=r,c,l;i[0]!==o||i[1]!==s||i[2]!==a?(c=()=>{e({initialState:a,formState:o,formStatus:s})},l=[a,o,s],i[0]=o,i[1]=s,i[2]=a,i[3]=c,i[4]=l):(c=i[3],l=i[4]),n(c,l)};export{r as t};

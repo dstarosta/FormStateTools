@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { act } from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { useFormState, z } from 'form-state';
 
 import FormDock, { type FormDockProps } from './form-dock';
+import { reportFormState } from './plugin/snapshot-source';
+import type { FormDockSnapshot } from './plugin/transport';
 
 const formSchema = z.object({
   id: z.formNumber({ required: true }),
@@ -17,6 +20,12 @@ const AppForm = (props: Omit<FormDockProps, 'form'>) => {
 
   return <FormDock {...props} form={form} />;
 };
+
+const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
+  initialState: { data: { name: '' }, errors: {} },
+  formState: { values: { name: 'a' } },
+  formStatus: { valid },
+});
 
 describe('FormDock', () => {
   beforeEach(() => {
@@ -63,5 +72,56 @@ describe('FormDock', () => {
     const html = renderToString(<AppForm devMode />);
 
     expect(html).not.toContain('EXPAND FORM TOOLS');
+  });
+
+  describe('transport mode (no form prop)', () => {
+    it('renders the dock once a snapshot is reported', () => {
+      render(<FormDock devMode captureErrors="none" />);
+
+      act(() => {
+        reportFormState(makeSnapshot());
+      });
+
+      expect(screen.getByText('EXPAND FORM TOOLS')).toBeInTheDocument();
+    });
+
+    it('reflects the reported snapshot validity in the header indicator', () => {
+      render(<FormDock devMode collapsed={false} captureErrors="none" />);
+
+      act(() => {
+        reportFormState(makeSnapshot(false));
+      });
+
+      expect(screen.getByTitle('The form has errors.')).toBeInTheDocument();
+    });
+
+    it('does not render in production mode even when a snapshot is reported', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+
+      render(<FormDock captureErrors="none" />);
+
+      act(() => {
+        reportFormState(makeSnapshot());
+      });
+
+      expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+    });
+
+    it('prefers the form prop over the transport snapshot', () => {
+      // Report an invalid snapshot over the transport, but pass a (valid) form
+      // prop; the prop must win, so no error indicator should show.
+      const AppFormValid = () => {
+        const form = useFormState(formSchema);
+        return <FormDock devMode collapsed={false} captureErrors="none" form={form} />;
+      };
+
+      render(<AppFormValid />);
+
+      act(() => {
+        reportFormState(makeSnapshot(false));
+      });
+
+      expect(screen.queryByTitle('The form has errors.')).not.toBeInTheDocument();
+    });
   });
 });

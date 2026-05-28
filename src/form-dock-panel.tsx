@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { JSONTree, type KeyPath } from 'react-json-tree';
-import type * as z from 'zod/mini';
-import type { FormStateResponse } from 'form-state';
 
 import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
+import type { FormDockSnapshot } from './plugin/transport';
 import FormDockHeader from './form-dock-header';
 import ErrorToast from './error-toast';
 import PopupPortal from './popup-portal';
@@ -12,7 +11,7 @@ import * as colors from './colors';
 type FormDockSize = 'minimized' | 'normal' | 'maximized';
 
 export type FormDockPanelProps = Readonly<{
-  form: FormStateResponse<z.ZodMiniObject>;
+  form: FormDockSnapshot;
   collapsed: boolean;
   captureErrors: CapturedErrorLevel;
   ignoreErrorPatterns: ErrorPattern[];

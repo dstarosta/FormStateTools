@@ -1,7 +1,11 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: 'src/index.ts',
+  entry: {
+    'form-state-tools': 'src/index.ts',
+    client: 'src/plugin/client.ts',
+    runtime: 'src/plugin/runtime.tsx',
+  },
   checks: {
     pluginTimings: false,
   },
