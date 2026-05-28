@@ -12,7 +12,7 @@ const emitToListeners = () => {
   }
 };
 
-const setSnapshot = (snapshot: FormDockSnapshot) => {
+const setSnapshot = (snapshot: FormDockSnapshot | undefined) => {
   current = snapshot;
   emitToListeners();
 };
@@ -74,6 +74,24 @@ export const reportFormState = (snapshot: FormDockSnapshot): void => {
 
   if (hot) {
     hot.send(FORM_DOCK_EVENT, snapshot);
+  }
+};
+
+/**
+ * Clear the current snapshot so the dock behaves as if no form is rendered.
+ *
+ * Called from `useFormDock`'s unmount cleanup: once the reporting form leaves
+ * the tree there is no live state to show, so the dock renders nothing. In dev
+ * the cleared state is relayed over the transport so a detached dock window or
+ * other tabs disappear too. In a production build this is a no-op.
+ */
+export const clearFormState = (): void => {
+  setSnapshot(undefined);
+
+  const hot = getHot();
+
+  if (hot) {
+    hot.send(FORM_DOCK_EVENT, undefined);
   }
 };
 

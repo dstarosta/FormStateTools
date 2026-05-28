@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { type FormDockSnapshot, reportFormState } from './plugin/snapshot-source';
+import { type FormDockSnapshot, clearFormState, reportFormState } from './plugin/snapshot-source';
 
 /**
  * Reports the given form snapshot to the plugin-injected `FormDock` whenever it
@@ -15,6 +15,9 @@ import { type FormDockSnapshot, reportFormState } from './plugin/snapshot-source
  * useFormDock(form);
  * ```
  *
+ * When the form unmounts, the snapshot is cleared so the dock behaves as if it
+ * is no longer rendered.
+ *
  * In a production build `reportFormState` is a no-op, so this hook costs nothing.
  */
 export const useFormDock = (form: FormDockSnapshot): void => {
@@ -23,4 +26,10 @@ export const useFormDock = (form: FormDockSnapshot): void => {
   useEffect(() => {
     reportFormState({ initialState, formState, formStatus });
   }, [initialState, formState, formStatus]);
+
+  useEffect(() => {
+    return () => {
+      clearFormState();
+    };
+  }, []);
 };

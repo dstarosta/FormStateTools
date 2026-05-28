@@ -5,8 +5,8 @@ import type { FormDockSnapshot } from './transport';
  * `vite/client` ambient types so the browser bundle stays self-contained.
  */
 export type ViteHot = {
-  on: (event: string, cb: (data: FormDockSnapshot) => void) => void;
-  send: (event: string, data: FormDockSnapshot) => void;
+  on: (event: string, cb: (data: FormDockSnapshot | undefined) => void) => void;
+  send: (event: string, data: FormDockSnapshot | undefined) => void;
 };
 
 /**

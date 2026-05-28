@@ -48,9 +48,12 @@ declare const reportFormState: (snapshot: FormDockSnapshot) => void;
  * useFormDock(form);
  * ```
  *
+ * When the form unmounts, the snapshot is cleared so the dock behaves as if it
+ * is no longer rendered.
+ *
  * In a production build `reportFormState` is a no-op, so this hook costs nothing.
  */
 declare const useFormDock: (form: FormDockSnapshot) => void;
 //#endregion
 export { reportFormState as n, FormDockSnapshot as r, useFormDock as t };
-//# sourceMappingURL=use-form-dock-ChNVBHPN.d.ts.map
+//# sourceMappingURL=use-form-dock-DKcwlVQV.d.ts.map

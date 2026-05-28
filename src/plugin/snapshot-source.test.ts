@@ -65,6 +65,45 @@ describe('snapshot-source', () => {
     });
   });
 
+  describe('clearFormState', () => {
+    it('resets the snapshot to undefined', async () => {
+      const { reportFormState, clearFormState, getSnapshot } = await importFresh();
+
+      reportFormState(makeSnapshot());
+      clearFormState();
+
+      expect(getSnapshot()).toBeUndefined();
+    });
+
+    it('notifies subscribers when cleared', async () => {
+      const { subscribeToSnapshots, clearFormState } = await importFresh();
+      const listener = vi.fn();
+
+      subscribeToSnapshots(listener);
+      clearFormState();
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('relays the cleared state over the transport', async () => {
+      const hot = makeHot();
+      getHot.mockReturnValue(hot as unknown as ViteHot);
+      const { clearFormState } = await importFresh();
+
+      clearFormState();
+
+      expect(hot.send).toHaveBeenCalledWith(FORM_DOCK_EVENT, undefined);
+    });
+
+    it('does not throw without a transport', async () => {
+      const { clearFormState } = await importFresh();
+
+      expect(() => {
+        clearFormState();
+      }).not.toThrow();
+    });
+  });
+
   describe('getServerSnapshot', () => {
     it('always returns undefined', async () => {
       const { getServerSnapshot, reportFormState } = await importFresh();
