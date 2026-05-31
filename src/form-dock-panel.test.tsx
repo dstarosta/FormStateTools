@@ -22,8 +22,6 @@ const formSchema = z
 
 const defaultProps: Omit<FormDockPanelProps, 'form'> = {
   collapsed: true,
-  captureErrors: 'all',
-  ignoreErrorPatterns: [],
 };
 
 const AppDockPanel = (props: Omit<FormDockPanelProps, 'form'>) => {

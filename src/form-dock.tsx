@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import FormDockPanel from './form-dock-panel';
+import ErrorToast from './error-toast';
 import {
   type FormDockSnapshot,
   subscribeToSnapshots,
@@ -102,9 +103,6 @@ function FormDock({
 }: FormDockProps) {
   const [isMounted, setIsMounted] = useState(false);
 
-  // Transport-driven mode: when no `form` prop is supplied, the latest snapshot
-  // comes from the dev transport. Subscribe unconditionally to satisfy the rules
-  // of hooks; the value is only used when `form` is absent.
   const transportSnapshot = useSyncExternalStore(
     subscribeToSnapshots,
     getSnapshot,
@@ -121,24 +119,24 @@ function FormDock({
     return null;
   }
 
-  const snapshot = form ?? transportSnapshot;
+  const isDevEnvironment =
+    devMode === true ||
+    (typeof process === 'object' && process.env['NODE_ENV']?.toLowerCase() === 'development');
 
-  if (
-    snapshot &&
-    (devMode === true ||
-      (typeof process === 'object' && process.env['NODE_ENV']?.toLowerCase() === 'development'))
-  ) {
-    return (
-      <FormDockPanel
-        form={snapshot}
-        collapsed={collapsed}
-        captureErrors={captureErrors}
-        ignoreErrorPatterns={ignoreErrorPatterns}
-      />
-    );
+  if (!isDevEnvironment) {
+    return null;
   }
 
-  return null;
+  const snapshot = form ?? transportSnapshot;
+
+  return (
+    <>
+      {captureErrors !== 'none' && (
+        <ErrorToast captureErrors={captureErrors} ignoreErrorPatterns={ignoreErrorPatterns} />
+      )}
+      {snapshot && <FormDockPanel form={snapshot} collapsed={collapsed} />}
+    </>
+  );
 }
 
 export default FormDock;

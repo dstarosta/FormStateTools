@@ -18,3 +18,15 @@ Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
 
 HTMLElement.prototype.showPopover = () => {};
 HTMLElement.prototype.hidePopover = () => {};
+
+// jsdom does not implement the <dialog> methods the error toast relies on.
+HTMLDialogElement.prototype.show = function (this: HTMLDialogElement) {
+  this.open = true;
+};
+HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+  this.open = true;
+};
+HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+  this.open = false;
+  this.dispatchEvent(new Event('close'));
+};

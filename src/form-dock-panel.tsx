@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { JSONTree, type KeyPath } from 'react-json-tree';
 
-import type { CapturedErrorLevel, ErrorPattern } from './form-dock';
 import type { FormDockSnapshot } from './plugin/transport';
 import FormDockHeader from './form-dock-header';
-import ErrorToast from './error-toast';
 import PopupPortal from './popup-portal';
 import * as colors from './colors';
 
@@ -13,8 +11,6 @@ type FormDockSize = 'minimized' | 'normal' | 'maximized';
 export type FormDockPanelProps = Readonly<{
   form: FormDockSnapshot;
   collapsed: boolean;
-  captureErrors: CapturedErrorLevel;
-  ignoreErrorPatterns: ErrorPattern[];
 }>;
 
 const FORM_SIZE_KEY = '__form-dock-size';
@@ -144,12 +140,7 @@ const renderTree = (data: object) => (
   />
 );
 
-function FormDockPanel({
-  form,
-  collapsed,
-  captureErrors,
-  ignoreErrorPatterns,
-}: FormDockPanelProps) {
+function FormDockPanel({ form, collapsed }: FormDockPanelProps) {
   const [size, setSize] = useState<FormDockSize>(() => getInitialSize(collapsed));
   const [detached, setDetached] = useState<boolean>(() => getInitialDetached());
 
@@ -282,9 +273,6 @@ function FormDockPanel({
             {renderTree(formObject)}
           </div>
         </PopupPortal>
-      )}
-      {captureErrors !== 'none' && (
-        <ErrorToast captureErrors={captureErrors} ignoreErrorPatterns={ignoreErrorPatterns} />
       )}
     </>
   );

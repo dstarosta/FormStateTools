@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, afterAll, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -15,19 +15,6 @@ describe('ErrorToast', async () => {
   globalThis.addEventListener('error', errorEventHandler);
 
   const { default: ErrorToast } = await import('./error-toast');
-
-  beforeEach(() => {
-    HTMLDialogElement.prototype.show = vi.fn(function (this: HTMLDialogElement) {
-      this.open = true;
-    });
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
-      this.open = true;
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
-      this.open = false;
-      this.dispatchEvent(new Event('close'));
-    });
-  });
 
   afterAll(() => {
     globalThis.removeEventListener('error', errorEventHandler);

@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { useFormState, z } from 'form-state';
 
 import FormDock, { type FormDockProps } from './form-dock';
-import { reportFormState } from './plugin/snapshot-source';
+import { clearFormState, reportFormState } from './plugin/snapshot-source';
 import type { FormDockSnapshot } from './plugin/transport';
 
 const formSchema = z.object({
@@ -30,6 +30,12 @@ const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
 describe('FormDock', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  afterEach(() => {
+    act(() => {
+      clearFormState();
+    });
   });
 
   it('renders FormDock in development mode', () => {
@@ -107,9 +113,29 @@ describe('FormDock', () => {
       expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
     });
 
+    it('captures errors before any snapshot is reported', async () => {
+      render(<FormDock devMode captureErrors="all" />);
+
+      expect(screen.queryByText('EXPAND FORM TOOLS')).not.toBeInTheDocument();
+
+      console.error('boom before any form');
+
+      await waitFor(() => {
+        expect(screen.getByText(/boom before any form/)).toBeInTheDocument();
+      });
+    });
+
+    it('does not mount the error toast when captureErrors is "none"', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<FormDock devMode captureErrors="none" />);
+
+      expect(console.error).toBe(errorSpy);
+
+      errorSpy.mockRestore();
+    });
+
     it('prefers the form prop over the transport snapshot', () => {
-      // Report an invalid snapshot over the transport, but pass a (valid) form
-      // prop; the prop must win, so no error indicator should show.
       const AppFormValid = () => {
         const form = useFormState(formSchema);
         return <FormDock devMode collapsed={false} captureErrors="none" form={form} />;
