@@ -136,6 +136,20 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
     [ignoreErrorPatterns, setErrors]
   );
 
+  const handleUnhandledRejection = useCallback(
+    (event: PromiseRejectionEvent) => {
+      const error: ErrorWrapper = {
+        type: 'thrown',
+        value: event.reason,
+      };
+
+      if (!isEmptyError(error) && !isIgnoredError(error, ignoreErrorPatterns)) {
+        setErrors([error]);
+      }
+    },
+    [ignoreErrorPatterns, setErrors]
+  );
+
   const handleClose = useCallback(() => {
     setErrors([]);
   }, [setErrors]);
@@ -150,6 +164,7 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
 
     if (captureThrownErrors) {
       globalThis.addEventListener('error', handleThrownError);
+      globalThis.addEventListener('unhandledrejection', handleUnhandledRejection);
     }
 
     const dialog = dialogRef.current;
@@ -165,13 +180,21 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
 
       if (captureThrownErrors) {
         globalThis.removeEventListener('error', handleThrownError);
+        globalThis.removeEventListener('unhandledrejection', handleUnhandledRejection);
       }
 
       if (captureConsoleErrors) {
         console.error = originalConsoleError;
       }
     };
-  }, [captureErrors, ignoreErrorPatterns, handleConsoleError, handleThrownError, handleClose]);
+  }, [
+    captureErrors,
+    ignoreErrorPatterns,
+    handleConsoleError,
+    handleThrownError,
+    handleUnhandledRejection,
+    handleClose,
+  ]);
 
   useEffect(() => {
     const dialog = dialogRef.current;

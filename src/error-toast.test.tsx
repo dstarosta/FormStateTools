@@ -315,6 +315,54 @@ describe('ErrorToast', async () => {
       expect(dialog?.open).toBe(false);
     });
 
+    it('should capture unhandled promise rejections when captureErrors is "thrown"', async () => {
+      render(<ErrorToast captureErrors="thrown" ignoreErrorPatterns={[]} />);
+
+      const reason = new Error('rejected reason');
+      const promise = Promise.reject(reason);
+      promise.catch(() => {});
+
+      globalThis.dispatchEvent(
+        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/rejected reason/)).toBeInTheDocument();
+      });
+    });
+
+    it('should not capture unhandled promise rejections when captureErrors is "console"', () => {
+      const { container } = render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
+
+      const reason = new Error('rejected reason');
+      const promise = Promise.reject(reason);
+      promise.catch(() => {});
+
+      globalThis.dispatchEvent(
+        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
+      );
+
+      const dialog = container.querySelector('dialog');
+      expect(dialog?.open).toBe(false);
+    });
+
+    it('respects ignoreErrorPatterns for unhandled promise rejections', () => {
+      const { container } = render(
+        <ErrorToast captureErrors="thrown" ignoreErrorPatterns={[/ignore me/]} />
+      );
+
+      const reason = new Error('ignore me please');
+      const promise = Promise.reject(reason);
+      promise.catch(() => {});
+
+      globalThis.dispatchEvent(
+        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
+      );
+
+      const dialog = container.querySelector('dialog');
+      expect(dialog?.open).toBe(false);
+    });
+
     it('should handle captureErrors value of "none" type', () => {
       const { container } = render(<ErrorToast captureErrors="none" ignoreErrorPatterns={[]} />);
 
