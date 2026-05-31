@@ -31,6 +31,9 @@ const runTransform = (
   return transform(code as never, id as never) as { code: string } | undefined;
 };
 
+const loadMountCode = (options?: FormStateToolsOptions): string =>
+  asFn(getPlugin(options).load)(RESOLVED_VIRTUAL_ID as never) as string;
+
 type HtmlTag = { tag: string; attrs: Record<string, string>; injectTo: string };
 
 const htmlTags = (plugin: Plugin): { order: string | undefined; tags: HtmlTag[] } => {
@@ -134,6 +137,36 @@ describe('formStateTools vite plugin', () => {
       const load = asFn(getPlugin().load);
 
       expect(load('virtual:something-else' as never)).toBeUndefined();
+    });
+
+    it('omits the options argument when no dock options are set', () => {
+      expect(loadMountCode()).toContain('mountFormDock();');
+    });
+
+    it('forwards collapsed and captureErrors to the mount call', () => {
+      const code = loadMountCode({ collapsed: false, captureErrors: 'console' });
+
+      expect(code).toContain('mountFormDock({ collapsed: false, captureErrors: "console" });');
+    });
+
+    it('emits string patterns as JSON-quoted literals', () => {
+      const code = loadMountCode({ ignoreErrorPatterns: ['ignore me'] });
+
+      expect(code).toContain('ignoreErrorPatterns: ["ignore me"]');
+    });
+
+    it('emits RegExp patterns as literals, preserving flags', () => {
+      const code = loadMountCode({ ignoreErrorPatterns: [/boom/gi, 'plain'] });
+
+      expect(code).toContain('ignoreErrorPatterns: [/boom/gi, "plain"]');
+    });
+
+    it('includes only the options that are explicitly set', () => {
+      const code = loadMountCode({ collapsed: true });
+
+      expect(code).toContain('mountFormDock({ collapsed: true });');
+      expect(code).not.toContain('captureErrors');
+      expect(code).not.toContain('ignoreErrorPatterns');
     });
   });
 

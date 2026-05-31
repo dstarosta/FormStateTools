@@ -1,5 +1,6 @@
 import type { Plugin } from 'vite';
 
+import type { CapturedErrorLevel, ErrorPattern } from '../form-dock';
 import { FORM_DOCK_EVENT } from './transport';
 
 const VIRTUAL_ID = 'virtual:form-state-tools/mount';
@@ -23,7 +24,31 @@ export type FormStateToolsOptions = {
    * is mounted solely via the module matched here.
    */
   clientEntry?: string;
+  /**
+   * Render the injected dock collapsed initially. Forwarded to `FormDock`'s
+   * `collapsed` prop. Defaults to `true`.
+   */
+  collapsed?: boolean;
+  /**
+   * Which errors the injected dock captures in its toast. Forwarded to
+   * `FormDock`'s `captureErrors` prop. Defaults to `'all'`.
+   */
+  captureErrors?: CapturedErrorLevel;
+  /**
+   * Error patterns the injected dock ignores. Strings and `RegExp` literals are
+   * both supported; a `RegExp` keeps its flags. Forwarded to `FormDock`'s
+   * `ignoreErrorPatterns` prop. Defaults to `[]`.
+   */
+  ignoreErrorPatterns?: ErrorPattern[];
 };
+
+/**
+ * Serializes an error pattern into source the generated virtual module can
+ * evaluate. A `RegExp` is emitted as a literal (e.g. `/foo/i`) so its flags
+ * survive — `JSON.stringify` would collapse it to `{}`; a string is JSON-quoted.
+ */
+const serializePattern = (pattern: ErrorPattern): string =>
+  pattern instanceof RegExp ? pattern.toString() : JSON.stringify(pattern);
 
 /**
  * Known client-entry module ids for SSR frameworks.
@@ -49,9 +74,23 @@ const CLIENT_ENTRY_IDS = [
  * ```
  */
 function formStateTools(options: FormStateToolsOptions = {}): Plugin {
-  const { enabled, clientEntry } = options;
+  const { enabled, clientEntry, collapsed, captureErrors, ignoreErrorPatterns } = options;
 
   const mountImport = `\nimport '${VIRTUAL_ID}';\n`;
+
+  const mountOptions: string[] = [];
+  if (collapsed !== undefined) {
+    mountOptions.push(`collapsed: ${JSON.stringify(collapsed)}`);
+  }
+  if (captureErrors !== undefined) {
+    mountOptions.push(`captureErrors: ${JSON.stringify(captureErrors)}`);
+  }
+  if (ignoreErrorPatterns !== undefined) {
+    mountOptions.push(
+      `ignoreErrorPatterns: [${ignoreErrorPatterns.map((pattern) => serializePattern(pattern)).join(', ')}]`
+    );
+  }
+  const mountArg = mountOptions.length > 0 ? `{ ${mountOptions.join(', ')} }` : '';
 
   let base = '/';
   let isReactRouter = false;
@@ -87,7 +126,7 @@ function formStateTools(options: FormStateToolsOptions = {}): Plugin {
 
     load(id) {
       return id === RESOLVED_VIRTUAL_ID
-        ? `import { mountFormDock } from 'form-state-tools/runtime';\nmountFormDock();\n`
+        ? `import { mountFormDock } from 'form-state-tools/runtime';\nmountFormDock(${mountArg});\n`
         : undefined;
     },
 
