@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import FormDockHeader from './form-dock-header';
-import * as colors from './colors';
+import FormDockHeader from '../src/form-dock-header';
+import * as colors from '../src/colors';
 
 const getStrip = () => screen.getByRole('button', { name: /form tools/i });
 const getDetachButton = () => screen.getByRole('button', { name: /^(detach|attach) panel/i });

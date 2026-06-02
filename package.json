@@ -35,7 +35,7 @@
     "check-ts": "node -e \"const v=require('typescript').version; if(v<'5.9.0'){console.error('❌ TS version '+v+' is too low. Need >= 5.9.0');process.exit(1)}\"",
     "build": "npm i && npm run prettier && npm run check-ts && npm run typecheck && npm run lint && npm run test && tsdown --config tsdown.types.config.ts && tsdown && tsdown --config tsdown.vite.config.ts",
     "lint": "eslint .",
-    "prettier": "prettier -c src/**",
+    "prettier": "prettier -c src/** tests/**",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage"
   },

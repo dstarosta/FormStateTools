@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { StrictMode, useState } from 'react';
 
-import FormDock from './form-dock';
-import { useFormDock } from './use-form-dock';
-import type { FormDockSnapshot } from './plugin/transport';
+import FormDock from '../src/form-dock';
+import { useFormDock } from '../src/use-form-dock';
+import type { FormDockSnapshot } from '../src/plugin/transport';
 
 const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
   initialState: { data: { name: '' }, errors: {} },

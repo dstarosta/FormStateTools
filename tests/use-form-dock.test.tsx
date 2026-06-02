@@ -2,12 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { act, StrictMode, useState } from 'react';
 
-import type { FormDockSnapshot } from './plugin/transport';
+import type { FormDockSnapshot } from '../src/plugin/transport';
 
 const reportFormState = vi.fn();
 const clearFormState = vi.fn();
 
-vi.mock('./plugin/snapshot-source', () => ({
+vi.mock('../src/plugin/snapshot-source', () => ({
   reportFormState: (snapshot: FormDockSnapshot) => {
     reportFormState(snapshot);
   },
@@ -16,7 +16,7 @@ vi.mock('./plugin/snapshot-source', () => ({
   },
 }));
 
-const { useFormDock } = await import('./use-form-dock');
+const { useFormDock } = await import('../src/use-form-dock');
 
 const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
   initialState: { data: {}, errors: {} },

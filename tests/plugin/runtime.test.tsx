@@ -11,11 +11,11 @@ vi.mock('react-dom/client', () => ({
   createRoot: (container: Element) => createRoot(container),
 }));
 
-vi.mock('../form-dock', () => ({
+vi.mock('../../src/form-dock', () => ({
   default: () => null,
 }));
 
-const { mountFormDock } = await import('./runtime');
+const { mountFormDock } = await import('../../src/plugin/runtime');
 
 const CONTAINER_SELECTOR = '#__form-state-tools-root';
 
@@ -32,8 +32,6 @@ describe('mountFormDock', () => {
     createRoot.mockClear();
     render.mockClear();
     setReadyState('complete');
-    // The mount is deferred by a short timeout past hydration; use fake timers so
-    // tests can flush it deterministically.
     vi.useFakeTimers();
   });
 
@@ -44,12 +42,13 @@ describe('mountFormDock', () => {
 
   it('appends a container to the body and renders into it (page already loaded)', () => {
     mountFormDock();
-    // Deferred — not mounted until the timeout elapses.
+
     expect(createRoot).not.toHaveBeenCalled();
 
     vi.runAllTimers();
 
     const container = document.querySelector(CONTAINER_SELECTOR);
+
     expect(container).toBeTruthy();
     expect(container?.parentElement).toBe(document.body);
     expect(createRoot).toHaveBeenCalledWith(container);
@@ -61,7 +60,7 @@ describe('mountFormDock', () => {
 
     mountFormDock();
     globalThis.dispatchEvent(new Event('load'));
-    // Still deferred until the timeout after load.
+
     expect(createRoot).not.toHaveBeenCalled();
 
     vi.runAllTimers();
@@ -79,7 +78,7 @@ describe('mountFormDock', () => {
 
   it('does nothing when there is no document (SSR)', () => {
     const original = globalThis.document;
-    // Simulate a non-browser environment.
+
     Object.defineProperty(globalThis, 'document', {
       value: undefined,
       configurable: true,

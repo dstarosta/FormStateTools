@@ -2,7 +2,7 @@ import { describe, it, expect, afterAll, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import * as colors from './colors';
+import * as colors from '../src/colors';
 
 const errorEventHandler = (event: ErrorEvent) => {
   event.preventDefault();
@@ -14,7 +14,7 @@ describe('ErrorToast', async () => {
 
   globalThis.addEventListener('error', errorEventHandler);
 
-  const { default: ErrorToast } = await import('./error-toast');
+  const { default: ErrorToast } = await import('../src/error-toast');
 
   afterAll(() => {
     globalThis.removeEventListener('error', errorEventHandler);

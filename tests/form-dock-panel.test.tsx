@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 
 import { useFormState, z } from 'form-state';
 
-import FormDockPanel, { type FormDockPanelProps } from './form-dock-panel';
+import FormDockPanel, { type FormDockPanelProps } from '../src/form-dock-panel';
 import userEvent from '@testing-library/user-event';
 
-vi.mock('./popup-portal', () => ({
+vi.mock('../src/popup-portal', () => ({
   default: ({ children }: { children: React.ReactNode; onClose: () => void }) => (
     <div data-testid="popup-portal">{children}</div>
   ),

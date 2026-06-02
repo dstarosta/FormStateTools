@@ -40,6 +40,6 @@
     "erasableSyntaxOnly": true,
     "useUnknownInCatchVariables": true
   },
-  "include": ["src/**/*", "*.ts"],
+  "include": ["src/**/*", "tests/**/*", "*.ts"],
   "exclude": ["node_modules", "dist"]
 }

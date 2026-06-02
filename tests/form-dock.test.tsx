@@ -5,9 +5,9 @@ import { renderToString } from 'react-dom/server';
 
 import { useFormState, z } from 'form-state';
 
-import FormDock, { type FormDockProps } from './form-dock';
-import { clearFormState, reportFormState } from './plugin/snapshot-source';
-import type { FormDockSnapshot } from './plugin/transport';
+import FormDock, { type FormDockProps } from '../src/form-dock';
+import { clearFormState, reportFormState } from '../src/plugin/snapshot-source';
+import type { FormDockSnapshot } from '../src/plugin/transport';
 
 const formSchema = z.object({
   id: z.formNumber({ required: true }),

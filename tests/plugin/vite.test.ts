@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Plugin } from 'vite';
 
-import formStateTools, { type FormStateToolsOptions } from './vite';
-import { FORM_DOCK_EVENT } from './transport';
+import formStateTools, { type FormStateToolsOptions } from '../../src/plugin/vite';
+import { FORM_DOCK_EVENT } from '../../src/plugin/transport';
 
 const VIRTUAL_ID = 'virtual:form-state-tools/mount';
 const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID;

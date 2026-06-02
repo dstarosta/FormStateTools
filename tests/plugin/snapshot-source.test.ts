@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FORM_DOCK_EVENT, type FormDockSnapshot } from './transport';
-import type { ViteHot } from './vite-hot';
+import { FORM_DOCK_EVENT, type FormDockSnapshot } from '../../src/plugin/transport';
+import type { ViteHot } from '../../src/plugin/vite-hot';
 
 const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
   initialState: { data: { name: '' }, errors: {} },
@@ -9,17 +9,15 @@ const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
   formStatus: { valid },
 });
 
-// Mockable seam: the store reads the Vite HMR client through getHot().
 const getHot = vi.fn<() => ViteHot | undefined>();
 
-vi.mock('./vite-hot', () => ({
+vi.mock('../../src/plugin/vite-hot', () => ({
   getHot: () => getHot(),
 }));
 
-// The store holds singleton state, so re-import it fresh per test.
 const importFresh = async () => {
   vi.resetModules();
-  return import('./snapshot-source');
+  return import('../../src/plugin/snapshot-source');
 };
 
 type MockHot = {

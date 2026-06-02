@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import { act, cleanup, render } from '@testing-library/react';
 
-import PopupPortal from './popup-portal';
+import PopupPortal from '../src/popup-portal';
 
 type FakePopupWindow = {
   document: Document;
