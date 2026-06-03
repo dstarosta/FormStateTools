@@ -4,7 +4,9 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "license": "MIT",
   "name": "form-state-tools",
