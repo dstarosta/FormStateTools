@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { act, StrictMode, useState } from 'react';
+import { act, render, screen } from '@testing-library/react';
+import { StrictMode, useState } from 'react';
 
 import type { FormDockSnapshot } from '../src/plugin/transport';
 

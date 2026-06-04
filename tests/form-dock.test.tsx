@@ -1,13 +1,18 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { act } from 'react';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-
 import { useFormState, z } from 'form-state';
 
 import FormDock, { type FormDockProps } from '../src/form-dock';
 import { clearFormState, reportFormState } from '../src/plugin/snapshot-source';
 import type { FormDockSnapshot } from '../src/plugin/transport';
+
+const { originalConsoleError } = vi.hoisted(() => {
+  const consoleError = console.error;
+  console.error = vi.fn();
+
+  return { originalConsoleError: consoleError };
+});
 
 const formSchema = z.object({
   id: z.formNumber({ required: true }),
@@ -28,6 +33,10 @@ const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
 });
 
 describe('FormDock', () => {
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
+
   beforeEach(() => {
     vi.unstubAllEnvs();
   });
