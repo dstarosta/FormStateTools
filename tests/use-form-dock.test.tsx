@@ -24,9 +24,26 @@ const makeSnapshot = (valid: boolean | null = true): FormDockSnapshot => ({
   formStatus: { valid },
 });
 
-const SnapshotForm = ({ snapshot }: { snapshot: FormDockSnapshot }) => {
-  useFormDock(snapshot);
+const SnapshotForm = ({ snapshot, enabled }: { snapshot: FormDockSnapshot; enabled?: boolean }) => {
+  useFormDock(snapshot, enabled);
   return null;
+};
+
+const EnableTogglingForm = ({ snapshot }: { snapshot: FormDockSnapshot }) => {
+  const [enabled, setEnabled] = useState(true);
+
+  useFormDock(snapshot, enabled);
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setEnabled((e) => !e);
+      }}
+    >
+      toggle
+    </button>
+  );
 };
 
 const TogglingForm = () => {
@@ -107,6 +124,37 @@ describe('useFormDock', () => {
     });
 
     expect(reportFormState).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not report when enabled is false', () => {
+    render(<SnapshotForm snapshot={makeSnapshot()} enabled={false} />);
+
+    expect(reportFormState).not.toHaveBeenCalled();
+    expect(clearFormState).toHaveBeenCalled();
+  });
+
+  it('reports when enabled is explicitly true', () => {
+    render(<SnapshotForm snapshot={makeSnapshot()} enabled={true} />);
+
+    expect(reportFormState).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears then resumes reporting as enabled toggles', () => {
+    render(<EnableTogglingForm snapshot={makeSnapshot()} />);
+    expect(reportFormState).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      screen.getByRole('button').click();
+    });
+
+    expect(reportFormState).toHaveBeenCalledTimes(1);
+    expect(clearFormState).toHaveBeenCalled();
+
+    act(() => {
+      screen.getByRole('button').click();
+    });
+
+    expect(reportFormState).toHaveBeenCalledTimes(2);
   });
 
   it('clears the snapshot on unmount', () => {
