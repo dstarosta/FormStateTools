@@ -1,6 +1,4 @@
-import { n as FormDockSnapshot } from "./snapshot-source-BlO08wZf.js";
-import * as _$react_jsx_runtime0 from "react/jsx-runtime";
-
+import { t as FormDockSnapshot } from "./transport-C3NKRAPc.js";
 //#region src/form-dock.d.ts
 /**
  * Defines what types of errors should be captured.
@@ -83,13 +81,7 @@ type FormDockProps = Readonly<{
  * <FormDock form={formState} collapsed={false} />
  * ```
  */
-declare function FormDock({
-  form,
-  devMode,
-  collapsed,
-  captureErrors,
-  ignoreErrorPatterns
-}: FormDockProps): _$react_jsx_runtime0.JSX.Element | null;
+declare function FormDock({ form, devMode, collapsed, captureErrors, ignoreErrorPatterns }: FormDockProps): import("react").JSX.Element | null;
 //#endregion
 export { ErrorPattern as n, FormDock as r, CapturedErrorLevel as t };
-//# sourceMappingURL=form-dock-XwceV8w1.d.ts.map
+//# sourceMappingURL=form-dock-B3KOkmSY.d.ts.map

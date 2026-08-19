@@ -12,12 +12,12 @@ describe('ErrorToast', async () => {
   const originalConsoleError = console.error;
   console.error = vi.fn();
 
-  globalThis.addEventListener('error', errorEventHandler);
+  addEventListener('error', errorEventHandler);
 
   const { default: ErrorToast } = await import('../src/error-toast');
 
   afterAll(() => {
-    globalThis.removeEventListener('error', errorEventHandler);
+    removeEventListener('error', errorEventHandler);
 
     console.error = originalConsoleError;
   });
@@ -126,7 +126,7 @@ describe('ErrorToast', async () => {
 
       const error = new Error('thrown error');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         const text = screen.getByText(/Error: thrown error/);
@@ -157,7 +157,7 @@ describe('ErrorToast', async () => {
     it('should filter out empty string errors', () => {
       const { container } = render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
-      console.error('   ');
+      console.error(' '.repeat(3));
 
       const dialog = container.querySelector('dialog');
       expect(dialog?.open).toBe(false);
@@ -271,7 +271,7 @@ describe('ErrorToast', async () => {
 
       const error = new Error('thrown error');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         expect(screen.getByText(/thrown error/)).toBeInTheDocument();
@@ -289,7 +289,7 @@ describe('ErrorToast', async () => {
 
       const error = new Error('thrown error');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         expect(screen.getByText(/thrown error/)).toBeInTheDocument();
@@ -309,7 +309,7 @@ describe('ErrorToast', async () => {
       const { container } = render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
       const error = new Error('thrown error');
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       const dialog = container.querySelector('dialog');
       expect(dialog?.open).toBe(false);
@@ -320,11 +320,10 @@ describe('ErrorToast', async () => {
 
       const reason = new Error('rejected reason');
       const promise = Promise.reject(reason);
+      // eslint-disable-next-line unicorn/prefer-await -- intentionally swallowing rejection noise without awaiting it, which would throw
       promise.catch(() => {});
 
-      globalThis.dispatchEvent(
-        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
-      );
+      dispatchEvent(new PromiseRejectionEvent('unhandledrejection', { promise, reason }));
 
       await waitFor(() => {
         expect(screen.getByText(/rejected reason/)).toBeInTheDocument();
@@ -336,11 +335,10 @@ describe('ErrorToast', async () => {
 
       const reason = new Error('rejected reason');
       const promise = Promise.reject(reason);
+      // eslint-disable-next-line unicorn/prefer-await -- intentionally swallowing rejection noise without awaiting it, which would throw
       promise.catch(() => {});
 
-      globalThis.dispatchEvent(
-        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
-      );
+      dispatchEvent(new PromiseRejectionEvent('unhandledrejection', { promise, reason }));
 
       const dialog = container.querySelector('dialog');
       expect(dialog?.open).toBe(false);
@@ -353,11 +351,10 @@ describe('ErrorToast', async () => {
 
       const reason = new Error('ignore me please');
       const promise = Promise.reject(reason);
+      // eslint-disable-next-line unicorn/prefer-await -- intentionally swallowing rejection noise without awaiting it, which would throw
       promise.catch(() => {});
 
-      globalThis.dispatchEvent(
-        new PromiseRejectionEvent('unhandledrejection', { promise, reason })
-      );
+      dispatchEvent(new PromiseRejectionEvent('unhandledrejection', { promise, reason }));
 
       const dialog = container.querySelector('dialog');
       expect(dialog?.open).toBe(false);
@@ -369,7 +366,7 @@ describe('ErrorToast', async () => {
       console.error('should not capture');
       const error = new Error('should not capture');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       const dialog = container.querySelector('dialog');
       expect(dialog?.open).toBe(false);
@@ -448,7 +445,7 @@ describe('ErrorToast', async () => {
 
       const error = new Error('thrown error');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         const heading = screen.getByText(/MOST RECENT ERROR/);
@@ -533,7 +530,7 @@ describe('ErrorToast', async () => {
     it('should filter empty errors from display', async () => {
       render(<ErrorToast captureErrors="console" ignoreErrorPatterns={[]} />);
 
-      console.error('valid error', null, undefined, '   ', []);
+      console.error('valid error', null, undefined, ' '.repeat(3), []);
 
       await waitFor(() => {
         expect(screen.getByText(/valid error/)).toBeInTheDocument();
@@ -866,7 +863,7 @@ describe('ErrorToast', async () => {
 
       const error = new TypeError('Type error occurred');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         expect(screen.getByText(/TypeError: Type error occurred/)).toBeInTheDocument();
@@ -885,7 +882,7 @@ describe('ErrorToast', async () => {
 
       const error = new CustomError('Custom error occurred');
 
-      globalThis.dispatchEvent(new ErrorEvent('error', { error }));
+      dispatchEvent(new ErrorEvent('error', { error }));
 
       await waitFor(() => {
         expect(screen.getByText(/CustomError: Custom error occurred/)).toBeInTheDocument();

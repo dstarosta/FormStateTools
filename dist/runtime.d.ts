@@ -1,5 +1,4 @@
-import { n as ErrorPattern, t as CapturedErrorLevel } from "./form-dock-XwceV8w1.js";
-
+import { n as ErrorPattern, t as CapturedErrorLevel } from "./form-dock-B3KOkmSY.js";
 //#region src/plugin/runtime.d.ts
 /**
  * Dock configuration the Vite plugin forwards to the injected `FormDock`. These

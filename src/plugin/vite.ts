@@ -98,7 +98,7 @@ function formStateTools(options: FormStateToolsOptions = {}): Plugin {
   const ROOT_MODULE = /[/\\]root\.[cm]?[jt]sx$/;
 
   const matchesInjectionTarget = (id: string): boolean => {
-    const cleanId = id.split('?')[0] ?? id;
+    const cleanId = id.split('?', 1)[0] ?? id;
     if (clientEntry) {
       return cleanId.includes(clientEntry);
     }

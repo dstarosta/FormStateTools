@@ -163,8 +163,8 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
     }
 
     if (captureThrownErrors) {
-      globalThis.addEventListener('error', handleThrownError);
-      globalThis.addEventListener('unhandledrejection', handleUnhandledRejection);
+      addEventListener('error', handleThrownError);
+      addEventListener('unhandledrejection', handleUnhandledRejection);
     }
 
     const dialog = dialogRef.current;
@@ -179,8 +179,8 @@ function ErrorToast({ captureErrors, ignoreErrorPatterns }: ErrorToastProps) {
       }
 
       if (captureThrownErrors) {
-        globalThis.removeEventListener('error', handleThrownError);
-        globalThis.removeEventListener('unhandledrejection', handleUnhandledRejection);
+        removeEventListener('error', handleThrownError);
+        removeEventListener('unhandledrejection', handleUnhandledRejection);
       }
 
       if (captureConsoleErrors) {

@@ -77,7 +77,7 @@ export const mountFormDock = (options: MountFormDockOptions = {}): void => {
   if (document.readyState === 'complete') {
     deferMount(options);
   } else {
-    globalThis.addEventListener(
+    addEventListener(
       'load',
       () => {
         deferMount(options);

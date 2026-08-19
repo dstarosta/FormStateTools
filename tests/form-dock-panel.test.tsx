@@ -59,7 +59,7 @@ describe('FormDock', () => {
       expect(screen.getByText('COLLAPSE FORM TOOLS')).toBeInTheDocument();
     });
 
-    it('renders FormDockPanel in normal mode', async () => {
+    it('toggles a state node when clicked in normal mode', async () => {
       render(<AppDockPanel {...defaultProps} collapsed={false} />);
 
       const user = userEvent.setup();

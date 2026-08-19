@@ -17,7 +17,7 @@ const FORM_SIZE_KEY = '__form-dock-size';
 const FORM_DETACHED_KEY = '__form-dock-detached';
 const VALID_SIZES = new Set<FormDockSize>(['minimized', 'normal', 'maximized']);
 
-const hasSessionStorage = () => typeof globalThis.sessionStorage === 'object';
+const hasSessionStorage = () => typeof sessionStorage === 'object';
 
 const SIZE_TO_HEIGHT: Record<FormDockSize, string> = {
   minimized: '1.625rem',
@@ -85,13 +85,15 @@ const setStoredDetached = (detached: boolean) => {
 };
 
 const initializeRef = (element: HTMLElement | null) => {
-  if (element) {
-    if (!element.style.getPropertyValue('pointer-events')) {
-      element.style.setProperty('pointer-events', 'auto', 'important');
-    }
-    if (!element.matches(':popover-open')) {
-      element.showPopover();
-    }
+  if (!element) {
+    return;
+  }
+
+  if (!element.style.getPropertyValue('pointer-events')) {
+    element.style.setProperty('pointer-events', 'auto', 'important');
+  }
+  if (!element.matches(':popover-open')) {
+    element.showPopover();
   }
 };
 

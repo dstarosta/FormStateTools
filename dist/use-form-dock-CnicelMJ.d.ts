@@ -1,5 +1,15 @@
-import { n as FormDockSnapshot } from "./snapshot-source-BlO08wZf.js";
-
+import { t as FormDockSnapshot } from "./transport-C3NKRAPc.js";
+//#region src/plugin/snapshot-source.d.ts
+/**
+ * Push the current form state to the dock. Call this from your form code whenever
+ * the form state changes (e.g. inside a TanStack Form `useStore`/`subscribe`).
+ *
+ * Updates the in-page dock immediately and, in dev, relays the snapshot over the
+ * Vite transport so a detached dock window or other tabs stay in sync. In a
+ * production build this is a no-op that tree-shakes away.
+ */
+declare const reportFormState: (snapshot: FormDockSnapshot) => void;
+//#endregion
 //#region src/use-form-dock.d.ts
 /**
  * Reports the given form snapshot to the plugin-injected `FormDock` whenever it
@@ -31,5 +41,5 @@ import { n as FormDockSnapshot } from "./snapshot-source-BlO08wZf.js";
  */
 declare const useFormDock: (form: FormDockSnapshot, enabled?: boolean) => void;
 //#endregion
-export { useFormDock as t };
-//# sourceMappingURL=use-form-dock-BVxt6UbK.d.ts.map
+export { reportFormState as n, useFormDock as t };
+//# sourceMappingURL=use-form-dock-CnicelMJ.d.ts.map

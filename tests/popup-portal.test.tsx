@@ -80,8 +80,10 @@ describe('PopupPortal', () => {
   });
 
   it('passes screen-sized popup features to host.open', () => {
-    Object.defineProperty(globalThis.screen, 'availWidth', { configurable: true, value: 1600 });
-    Object.defineProperty(globalThis.screen, 'availHeight', { configurable: true, value: 900 });
+    Object.defineProperties(screen, {
+      availWidth: { configurable: true, value: 1600 },
+      availHeight: { configurable: true, value: 900 },
+    });
 
     render(<PopupPortal onClose={vi.fn()}>x</PopupPortal>);
 

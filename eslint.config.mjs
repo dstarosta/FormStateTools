@@ -17,7 +17,7 @@ export default defineConfig([
     extends: [
       js.configs.recommended,
       tseslint.configs.strictTypeChecked,
-      eslintPluginUnicorn.configs.all,
+      eslintPluginUnicorn.configs.unopinionated,
       formState.configs.recommended,
       sonarjs.configs.recommended,
       react.configs.flat.recommended,
@@ -56,6 +56,7 @@ export default defineConfig([
       'sonarjs/cognitive-complexity': 'off', // reducers and schema visitors are difficult to break up into _readable_ small functions
       'sonarjs/function-return-type': 'off', // different return types (ex: discriminated unions) are not an issue
       'sonarjs/no-nested-functions': 'off', // nested functions are very useful for closures in TS/JS
+      'sonarjs/parameterized-tests': 'off', // clusters often have varied setup/assertions; merging into it.each hurts readability more than it helps
       'sonarjs/todo-tag': 'warn', // a TODO comment should not break the build; but it's a good idea to periodically remind you about it
       // Annoying Unicorn rules
       'unicorn/no-array-sort': 'off', // This method is only available in ES2023.
@@ -64,7 +65,6 @@ export default defineConfig([
       'unicorn/numeric-separators-style': 'off', // always forcing underscores in numeric constants makes no sense
       'unicorn/prefer-string-replace-all': 'off', // replace(/[set of numbers]/g) is way more terse for fallback GUID generation
       'unicorn/prefer-structured-clone': 'off', // it cannot clone objects with functions
-      'unicorn/prevent-abbreviations': 'off', // "ref" and "args" abbreviations are commonly used
       // Testing rules
       'testing-library/no-node-access': 'off', // dialog and svg elements are not easy to find with a role
     },

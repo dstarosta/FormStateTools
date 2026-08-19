@@ -28,7 +28,7 @@ const setReadyState = (value: DocumentReadyState) => {
 
 describe('mountFormDock', () => {
   beforeEach(() => {
-    document.body.innerHTML = '';
+    document.body.replaceChildren();
     createRoot.mockClear();
     render.mockClear();
     setReadyState('complete');
@@ -59,7 +59,7 @@ describe('mountFormDock', () => {
     setReadyState('loading');
 
     mountFormDock();
-    globalThis.dispatchEvent(new Event('load'));
+    dispatchEvent(new Event('load'));
 
     expect(createRoot).not.toHaveBeenCalled();
 
@@ -77,7 +77,7 @@ describe('mountFormDock', () => {
   });
 
   it('does nothing when there is no document (SSR)', () => {
-    const original = globalThis.document;
+    const original = document;
 
     Object.defineProperty(globalThis, 'document', {
       value: undefined,

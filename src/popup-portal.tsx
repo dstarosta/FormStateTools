@@ -70,6 +70,7 @@ function PopupPortal({ onClose, children }: PopupPortalProps) {
   const [target, setTarget] = useState<PortalTarget | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line unicorn/no-unnecessary-global-this -- `globalThis` alone loses the `Window` type
     const host = globalThis.window as Window | undefined;
 
     if (!host || typeof host.open !== 'function') {
@@ -95,8 +96,8 @@ function PopupPortal({ onClose, children }: PopupPortalProps) {
         return;
       }
 
-      opened.document.head.innerHTML = '';
-      opened.document.body.innerHTML = '';
+      opened.document.head.replaceChildren();
+      opened.document.body.replaceChildren();
       opened.document.title = 'Form State Tools';
       opened.document.documentElement.style.height = '100%';
       opened.document.documentElement.style.background = PANEL_BACKGROUND_COLOR;

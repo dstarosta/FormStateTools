@@ -1,1 +1,1 @@
-{"version":3,"file":"runtime.d.ts","names":[],"sources":["../src/plugin/runtime.tsx"],"mappings":";;;;;AAWA;;;KAAY,oBAAA;EAIV;;;EAAA,SAAA;EAcsB;;AAAY;AA0CpC;;EAlDE,aAAA,GAAgB,kBAAA;EAkDqB;AAAyB;;;;;;EA1C9D,mBAAA,GAAsB,YAAY;AAAA;;;;;;;;;;;;;;;;;;;;;cA0CvB,aAAA,GAAiB,OAAkC,GAAzB,oBAAyB"}
+{"version":3,"file":"runtime.d.ts","names":[],"sources":["../src/plugin/runtime.tsx"],"mappings":";;;;;;;KAWY;;;;EAIV;;;;;;EAMA,gBAAgB;;;;;;;;EAQhB,sBAAsB;;;;;;;;;;;;;;;;;;;;;;cA0CX,gBAAiB,UAAS"}

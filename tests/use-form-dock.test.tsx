@@ -163,7 +163,7 @@ describe('useFormDock', () => {
 
     unmount();
 
-    expect(clearFormState.mock.calls.length).toBe(beforeUnmount + 1);
+    expect(clearFormState.mock.calls).toHaveLength(beforeUnmount + 1);
   });
 
   it('does not clear the snapshot on rerender', () => {
@@ -174,7 +174,7 @@ describe('useFormDock', () => {
       screen.getByRole('button').click();
     });
 
-    expect(clearFormState.mock.calls.length).toBe(afterMount);
+    expect(clearFormState.mock.calls).toHaveLength(afterMount);
   });
 
   it('reports the snapshot after StrictMode mount/remount, leaving the dock populated', () => {
